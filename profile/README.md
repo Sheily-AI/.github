@@ -1,5 +1,11 @@
 # Sheily-AI
 
+## Panel para miembros
+
+[**Abrir panel interno: actividad, estadísticas, seguridad y documentación**](https://github.com/Sheily-AI/.github-private) · [Proyecto de organización](https://github.com/orgs/Sheily-AI/projects/1)
+
+El panel interno requiere iniciar sesión con una cuenta con acceso. Las estadísticas y ejecuciones se consultan en las vistas de GitHub de cada repositorio.
+
 **Inteligencia local · continuidad · evidencia · adaptación gobernada**
 
 Sheily-AI reúne tres proyectos de inteligencia artificial con responsabilidades distintas: **SHEILY-COGNITIVA** organiza la interacción y las capacidades, **KV-SHEI** desarrolla inferencia y memoria K/V, e **INICIO** estudia y gobierna la adaptación. Dos repositorios adicionales mantienen dependencias concretas de KV-SHEI. Esta portada es un mapa para entender el conjunto; cada sistema conserva su propia autoridad y su propio estado operativo.
@@ -51,4 +57,4 @@ Una declaración de código, un test aprobado, un binario compilado, una release
 
 ## Acceso y seguimiento
 
-Los cinco repositorios de sistemas y dependencias son **privados actualmente**. Aquí se muestran sus nombres y funciones, pero sus enlaces a código, documentación, issues y pull requests requieren permiso. El repositorio público [.github](https://github.com/Sheily-AI/.github) alberga únicamente esta presentación. Cada proyecto mantiene sus propias condiciones de uso, seguridad y contribución; no existe una licencia o un estado de producción único para toda la organización.
+Los repositorios de sistemas y dependencias son **privados actualmente**. Aquí se muestran sus nombres y funciones, pero sus enlaces a código, documentación, issues y pull requests requieren permiso. El repositorio público [.github](https://github.com/Sheily-AI/.github) alberga únicamente esta presentación. Cada proyecto mantiene sus propias condiciones de uso, seguridad y contribución; no existe una licencia o un estado de producción único para toda la organización.
