@@ -10,6 +10,13 @@ El panel interno requiere iniciar sesión con una cuenta con acceso. Las estadí
 
 Sheily-AI reúne tres proyectos de inteligencia artificial con responsabilidades distintas: **SHEILY-COGNITIVA** organiza la interacción y las capacidades, **KV-SHEI** desarrolla inferencia y memoria K/V, e **INICIO** estudia y gobierna la adaptación. Dos repositorios adicionales mantienen dependencias concretas de KV-SHEI. Esta portada es un mapa para entender el conjunto; cada sistema conserva su propia autoridad y su propio estado operativo.
 
+## Proyectos principales
+
+[SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) · [KV-SHEI / M-SLIM](https://github.com/Sheily-AI/KV-SHEI) · [INICIO](https://github.com/Sheily-AI/INICIO)
+
+<details>
+<summary>Proyectos y documentación técnica</summary>
+
 ## Qué buscamos
 
 Queremos que una capacidad no se defina solo por estar escrita en el código. Importan el contrato que la describe, quién puede ejecutarla, qué efecto produce, qué estado conserva y qué evidencia permite comprobarla. Por eso distinguimos arquitectura, pruebas, artefactos, servicios activos y resultados reales. También distinguimos la memoria cognitiva de SHEILY del estado físico K/V de un modelo: son problemas relacionados, pero no la misma cosa.
@@ -54,6 +61,9 @@ Son dependencias, no otros productos de la organización. Sus revisiones y licen
 ## Cómo interpretar el estado de una capacidad
 
 Una declaración de código, un test aprobado, un binario compilado, una release instalada y un servicio que responde son hechos diferentes. Para afirmar funcionamiento en una ruta concreta se necesita enlazar la versión fuente con la configuración efectiva, el artefacto, la petición real, el efecto y, cuando aplique, la persistencia y recuperación. Los documentos de estado son observaciones fechadas; no son indicadores en tiempo real. La portada no sustituye esas comprobaciones ni promete que todas las rutas estén activas en todos los entornos.
+
+
+</details>
 
 ## Acceso y seguimiento
 
