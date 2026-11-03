@@ -1,24 +1,34 @@
 # Sheily-AI
 
-Desarrollamos sistemas de inteligencia artificial local con atención a la continuidad, la trazabilidad y la evidencia de funcionamiento. La organización reúne tres proyectos distintos y dos dependencias mantenidas para KV-SHEI.
+**Cognición · inferencia · memoria · adaptación**
 
-## Proyectos principales
+Construimos inteligencia artificial local con un criterio común: que cada capacidad pueda entenderse, comprobarse y mantenerse. Sheily-AI reúne tres sistemas diferentes y dos dependencias mantenidas para uno de ellos. Cada repositorio conserva su propia arquitectura, contratos y evidencia.
 
-| Proyecto | Función |
-| --- | --- |
-| [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) | Sistema cognitivo modular en Rust: capacidades, inferencia, memoria y gobernanza. |
-| [KV-SHEI](https://github.com/Sheily-AI/KV-SHEI) | Arquitectura de inferencia y memoria K/V. Su runtime M-SLIM implementa ejecución local, persistencia, continuidad y validación. |
-| [INICIO](https://github.com/Sheily-AI/INICIO) | Runtime adaptativo en Python para observación, evaluación de propuestas y cambios gobernados con evidencia. |
+## El ecosistema
 
-Son proyectos diferentes: el nombre de uno no implica que sus funciones estén integradas o desplegadas en los otros.
+### [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) · cognición
 
-## Dependencias mantenidas
+Sistema cognitivo modular con núcleo Rust. Organiza capacidades, solicitudes, inferencia y memoria bajo reglas de gobernanza y trazabilidad.
 
-| Repositorio | Función |
-| --- | --- |
-| [KV-SHEI-tch-rs](https://github.com/Sheily-AI/KV-SHEI-tch-rs) | Fork mantenido de tch/torch-sys para el backend LibTorch de KV-SHEI. |
-| [KV-SHEI-tokenizador-rust](https://github.com/Sheily-AI/KV-SHEI-tokenizador-rust) | Fork mantenido de tokenizers para KV-SHEI. |
+### [KV-SHEI](https://github.com/Sheily-AI/KV-SHEI) · inferencia y continuidad K/V
 
-## Acceso y estado
+Arquitectura de inferencia y memoria del contexto. Su runtime **M-SLIM** ejecuta modelos locales y trabaja con estado K/V, persistencia, continuidad, validación y evidencia de ejecución.
 
-Los cinco repositorios son privados actualmente; sus enlaces requieren permiso. Esta portada explica la organización de los proyectos, pero no certifica por sí misma una versión, un despliegue ni el rendimiento de una capacidad. Para conocer el estado de cada sistema, consulta su documentación, sus cambios y su evidencia en el repositorio correspondiente.
+### [INICIO](https://github.com/Sheily-AI/INICIO) · adaptación gobernada
+
+Runtime en Python para observar dinámicas, evaluar propuestas y controlar cambios estructurales mediante evidencia, persistencia y trazabilidad.
+
+Estos sistemas comparten una dirección de trabajo, pero **son proyectos distintos**. Una función descrita en uno no debe atribuirse automáticamente a los otros ni considerarse desplegada sin comprobar su estado real.
+
+## Dependencias de KV-SHEI
+
+- [KV-SHEI-tch-rs](https://github.com/Sheily-AI/KV-SHEI-tch-rs): fork mantenido de tch/torch-sys para el backend LibTorch.
+- [KV-SHEI-tokenizador-rust](https://github.com/Sheily-AI/KV-SHEI-tokenizador-rust): fork mantenido de tokenizers para el procesamiento de tokens.
+
+## Cómo entendemos el estado de una capacidad
+
+El código, las pruebas, el artefacto instalado y su funcionamiento en una ejecución real son evidencias diferentes. La portada describe el propósito de cada sistema; el estado, las limitaciones y las garantías de una capacidad se comprueban en la documentación y los recibos de su repositorio, ligados a la versión correspondiente.
+
+## Acceso
+
+Los cinco repositorios de producto y dependencias son **privados actualmente**. Sus nombres y funciones se muestran aquí, pero los enlaces requieren permisos para consultar el código, los issues o los pull requests. El repositorio .github es público y solo contiene la presentación de la organización.
