@@ -62,3 +62,21 @@ Este repositorio `.github` y su Wiki son públicos. Los cinco repositorios enlaz
 - Este `README.md` explica el mapa y las reglas de lectura dentro del repositorio `.github`.
 - La [Wiki](https://github.com/Sheily-AI/.github/wiki) ayuda a navegar, pero no reemplaza la documentación técnica canónica.
 - Cuando cambie la organización de los proyectos, actualiza juntos los nombres, enlaces, límites de acceso y descripciones; no conviertas propuestas o pruebas en hechos de producción.
+
+<!-- SHEILY_CODE_REALITY_START -->
+## Observed technical state
+
+- Local branch: main
+- Observed SHA: 4ca42d0ecef7
+- Working tree: dirty
+- Code / tests detected: 0 / 0
+- GitHub Actions workflows: 1
+- Execution entrypoints/surfaces: 0
+
+Details are generated from the code rather than manual claims:
+- docs/CODE_REALITY.md
+- docs/EXECUTION_FLOWS.md
+- docs/CI_OPERATIONS.md
+
+This section is an observed snapshot, not a production certification.
+<!-- SHEILY_CODE_REALITY_END -->
