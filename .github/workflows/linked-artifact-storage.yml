@@ -1,0 +1,91 @@
+name: Verified linked-artifact storage (organization-wide)
+
+on:
+  workflow_call:
+    inputs:
+      release_tag:
+        description: Existing published GitHub Release tag
+        type: string
+        required: true
+      archive_name:
+        description: Exact release archive asset name
+        type: string
+        required: true
+      checksum_name:
+        description: Exact SHA256SUMS release asset name
+        type: string
+        required: true
+
+jobs:
+  register:
+    name: Verify release archive and register GitHub artifact metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      attestations: read
+      artifact-metadata: write
+    steps:
+      - name: Verify remote release, checksum, and build attestation
+        id: evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          ARCHIVE: ${{ inputs.archive_name }}
+          CHECKSUM: ${{ inputs.checksum_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${GITHUB_REPOSITORY%%/*}" == "Sheily-AI" ]] || exit 2
+          for value in "$RELEASE_TAG" "$ARCHIVE" "$CHECKSUM"; do
+            [[ "$value" =~ ^[A-Za-z0-9][A-Za-z0-9_.+-]{0,200}$ ]] || exit 2
+          done
+          [[ "$ARCHIVE" != "$CHECKSUM" ]] || exit 2
+          workspace="$(mktemp -d "${RUNNER_TEMP}/linked-artifact.XXXXXXXX")"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json isDraft --jq '.isDraft' | grep -Fx false
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --dir "$workspace" --pattern "$ARCHIVE"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --dir "$workspace" --pattern "$CHECKSUM"
+          test -f "$workspace/$ARCHIVE"
+          test -f "$workspace/$CHECKSUM"
+          expected="$(python3 -c 'import re,sys,pathlib; lines=pathlib.Path(sys.argv[1]).read_text().splitlines(); matches=[m.group(1).lower() for line in lines if (m:=re.fullmatch(r"([0-9a-fA-F]{64})\s+\*?(.+)",line)) and m.group(2)==sys.argv[2]]; sys.exit(2) if len(matches)!=1 else print(matches[0])' "$workspace/$CHECKSUM" "$ARCHIVE")"
+          actual="$(sha256sum "$workspace/$ARCHIVE" | cut -d' ' -f1)"
+          [[ "$actual" == "$expected" ]] || {
+            echo "Published asset and SHA-256 receipt mismatch" >&2; exit 2;
+          }
+          gh attestation verify "$workspace/$ARCHIVE" --repo "$GITHUB_REPOSITORY" >/dev/null
+          echo "digest=sha256:$actual" >> "$GITHUB_OUTPUT"
+
+      - name: POST metadata and independently verify remote record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          ARCHIVE: ${{ inputs.archive_name }}
+          DIGEST: ${{ steps.evidence.outputs.digest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://github.com/$GITHUB_REPOSITORY/releases"
+          asset_url="$base/download/$RELEASE_TAG/$ARCHIVE"
+          org="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY#*/}"
+          payload="$(python3 -c 'import json,sys; a,d,u,b,r,t=sys.argv[1:];print(json.dumps({"name":a,"digest":d,"artifact_url":u,"registry_url":b,"repository":r,"github_repository":r,"version":t,"status":"active","return_records":True}))' "$ARCHIVE" "$DIGEST" "$asset_url" "$base" "$repo" "$RELEASE_TAG")"
+          posted="$(gh api -X POST -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "orgs/$org/artifacts/metadata/storage-record" --input - <<< "$payload")"
+          python3 -c 'import json,sys; rs=json.loads(sys.stdin.read()).get("storage_records") or [];sys.exit(0 if any(x.get("digest")==sys.argv[1] and x.get("artifact_url")==sys.argv[2] for x in rs) else 2)' \
+            "$DIGEST" "$asset_url" <<< "$posted"
+          observed="$(gh api -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "orgs/$org/artifacts/$DIGEST/metadata/storage-records")"
+          python3 -c 'import json,sys; rs=json.loads(sys.stdin.read()).get("storage_records") or [];sys.exit(0 if any(x.get("digest")==sys.argv[1] and x.get("artifact_url")==sys.argv[2] and x.get("registry_url")==sys.argv[3] and x.get("status")=="active" for x in rs) else 2)' \
+            "$DIGEST" "$asset_url" "$base" <<< "$observed"
+          {
+            echo "### Verified linked artifact"
+            echo "- Repository: $GITHUB_REPOSITORY"
+            echo "- Release tag: $RELEASE_TAG"
+            echo "- Published asset: $ARCHIVE"
+            echo "- SHA-256: $DIGEST"
+            echo "- GitHub Artifact Metadata: POST and readback matched"
+            echo "- Deployment and production readiness: NOT certified"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse workflow files
+        run: |
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import pathlib, sys, yaml
+          files = sorted(pathlib.Path(".github/workflows").glob("*.yml"))
+          if not files:
+              sys.exit("no workflow files")
+          for path in files:
+              loaded = yaml.safe_load(path.read_text())
+              if not isinstance(loaded, dict) or "jobs" not in loaded:
+                  sys.exit(f"{path} has no jobs")
+              print(path)
+          PY
