@@ -3,17 +3,7 @@
 > Entry points and immediate calls extracted from actual code.
 
 - Branch: main
-- SHA: 4ca42d0ecef72568ff9c58ef1ae3a22e95c7df13
+- SHA: 36a1afe4cf29b0698a18758acd5011530a54d588
 
 ## Entrypoints
 
-No conventional entrypoints detected.
-
-## External boundaries
-
-- HTTP/network: workflows/add-to-project.yml
-- GitHub: workflows/add-to-project.yml
-
-## Referenced environment variables
-
-None detected.

@@ -67,10 +67,10 @@ Este repositorio `.github` y su Wiki son públicos. Los cinco repositorios enlaz
 ## Observed technical state
 
 - Local branch: main
-- Observed SHA: 4ca42d0ecef7
-- Working tree: dirty
+- Observed SHA: 36a1afe4cf29
+- Working tree: clean
 - Code / tests detected: 0 / 0
-- GitHub Actions workflows: 1
+- GitHub Actions workflows: 2
 - Execution entrypoints/surfaces: 0
 
 Details are generated from the code rather than manual claims:
