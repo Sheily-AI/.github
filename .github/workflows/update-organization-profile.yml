@@ -2,7 +2,7 @@ name: Update organization profile
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
   repository_dispatch:
     types: [project-changed]
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Generate profile from GitHub metadata
         env:
           PROFILE_SOURCE_TOKEN: ${{ secrets.SHEILY_READ_TOKEN }}
