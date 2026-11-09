@@ -27,3 +27,9 @@ jobs:
                   sys.exit(f"{path} has no jobs")
               print(path)
           PY
+  profile-generator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test profile generator
+        run: python3 -m unittest discover -s tests -v

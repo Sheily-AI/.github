@@ -59,6 +59,8 @@ Este repositorio `.github` y su Wiki son públicos. Los cinco repositorios enlaz
 ## Mantenimiento de esta portada
 
 - [`profile/README.md`](profile/README.md) es la portada visible en la página principal de la organización.
+- [`scripts/generate_profile.py`](scripts/generate_profile.py) actualiza la región automática usando la lista pública deliberada de [`profile/catalog.json`](profile/catalog.json); no lee ni publica código privado.
+- El workflow `Update organization profile` comprueba cambios cada hora, puede ejecutarse manualmente y acepta el evento `project-changed` para integraciones inmediatas.
 - Este `README.md` explica el mapa y las reglas de lectura dentro del repositorio `.github`.
 - La [Wiki](https://github.com/Sheily-AI/.github/wiki) ayuda a navegar, pero no reemplaza la documentación técnica canónica.
 - Cuando cambie la organización de los proyectos, actualiza juntos los nombres, enlaces, límites de acceso y descripciones; no conviertas propuestas o pruebas en hechos de producción.

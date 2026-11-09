@@ -1,0 +1,43 @@
+name: Update organization profile
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [project-changed]
+  push:
+    branches: [main]
+    paths:
+      - profile/catalog.json
+      - scripts/generate_profile.py
+      - .github/workflows/update-organization-profile.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-organization-profile
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate profile from GitHub metadata
+        env:
+          PROFILE_SOURCE_TOKEN: ${{ secrets.SHEILY_READ_TOKEN }}
+        run: python3 scripts/generate_profile.py
+      - name: Publish a changed profile
+        run: |
+          if git diff --quiet -- profile/README.md; then
+            echo "The profile is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile/README.md
+          git commit -m "docs: refresh organization profile"
+          git push
