@@ -1,5 +1,9 @@
 import importlib.util
+import json
 import pathlib
+import subprocess
+import sys
+import tempfile
 import unittest
 
 
@@ -40,6 +44,60 @@ class GenerateProfileTests(unittest.TestCase):
     def test_replace_requires_one_owned_region(self):
         with self.assertRaises(ValueError):
             MODULE.replace_generated_section("# no markers", "replacement")
+
+    def test_command_line_generation_and_check_are_idempotent(self):
+        catalog = {
+            "organization": "Sheily-AI",
+            "repositories": [{"name": "SHEILY", "label": "SHEILY"}],
+        }
+        metadata = [
+            {
+                "name": "SHEILY",
+                "html_url": "https://github.com/Sheily-AI/SHEILY",
+                "description": "Producto cognitivo gobernado.",
+                "default_branch": "main",
+                "private": True,
+                "archived": False,
+                "pushed_at": "2026-11-09T17:49:04Z",
+            }
+        ]
+        initial_profile = "\n".join(
+            [
+                "# Sheily-AI",
+                MODULE.START_MARKER,
+                "Pendiente.",
+                MODULE.END_MARKER,
+                "",
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = pathlib.Path(directory)
+            catalog_path = temporary / "catalog.json"
+            metadata_path = temporary / "metadata.json"
+            profile_path = temporary / "README.md"
+            catalog_path.write_text(json.dumps(catalog), encoding="utf-8")
+            metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+            profile_path.write_text(initial_profile, encoding="utf-8")
+            command = [
+                sys.executable,
+                str(ROOT / "scripts" / "generate_profile.py"),
+                "--catalog",
+                str(catalog_path),
+                "--profile",
+                str(profile_path),
+                "--metadata-file",
+                str(metadata_path),
+            ]
+
+            generated = subprocess.run(command, capture_output=True, text=True, check=False)
+            checked = subprocess.run(
+                [*command, "--check"], capture_output=True, text=True, check=False
+            )
+
+            self.assertEqual(generated.returncode, 0, generated.stderr)
+            self.assertEqual(checked.returncode, 0, checked.stderr)
+            self.assertIn("Producto cognitivo gobernado.", profile_path.read_text())
 
 
 if __name__ == "__main__":
