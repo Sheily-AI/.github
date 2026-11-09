@@ -12,7 +12,7 @@ jobs:
   workflows:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Parse workflow files
         run: |
           python3 -m pip install --quiet pyyaml
@@ -30,6 +30,6 @@ jobs:
   profile-generator:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Test profile generator
         run: python3 -m unittest discover -s tests -v
