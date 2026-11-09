@@ -14,6 +14,22 @@ Sheily-AI reúne tres proyectos de inteligencia artificial con responsabilidades
 
 [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) · [KV-SHEI / M-SLIM](https://github.com/Sheily-AI/KV-SHEI) · [INICIO](https://github.com/Sheily-AI/INICIO)
 
+<!-- SHEILY_ORG_PROJECTS_START -->
+## Estado automático de los proyectos
+
+Esta tabla se genera desde los metadatos de GitHub. Indica actividad del repositorio; no certifica que una versión esté desplegada o funcionando.
+
+| Proyecto | Descripción publicada | Rama | Acceso | Último cambio en GitHub |
+| --- | --- | --- | --- | --- |
+| [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) | Producto cognitivo gobernado de SHEILY: núcleo Rust, capacidades, inferencia, memoria y evidencia; los sistemas externos viven en repositorios independientes. | `main` | privado | 2026-11-09 17:49 UTC |
+| [KV-SHEI / M-SLIM](https://github.com/Sheily-AI/KV-SHEI) | M-SLIM: runtime local en Rust para ejecutar modelos de lenguaje, gestionar la caché K/V y conservar sesiones con identidad verificable, validación y recibos de ejecución. | `main` | privado | 2026-11-09 17:48 UTC |
+| [INICIO](https://github.com/Sheily-AI/INICIO) | Runtime adaptativo gobernado en Python: observa dinámicas, evalúa propuestas de aprendizaje y controla cambios estructurales con evidencia, persistencia y trazabilidad. | `main` | privado | 2026-11-09 17:21 UTC |
+| [KV-SHEI-tch-rs](https://github.com/Sheily-AI/KV-SHEI-tch-rs) | Fork de seguridad mantenido para el backend LibTorch de KV-SHEI/M-SLIM: tch 0.18.1 compatible con PyTorch/LibTorch 2.5.1 y migración de zip vulnerable a 9.0.5. | `security/zip-9.0.5-tch-0.18.1` | privado | 2026-11-07 11:24 UTC |
+| [KV-SHEI-tokenizador-rust](https://github.com/Sheily-AI/KV-SHEI-tokenizador-rust) | Fork de mantenimiento para KV-SHEI/M-SLIM: conserva tokenizers 0.22.2 y sustituye la dependencia sin mantenimiento paste por pastey mediante un commit inmutable. | `security/replace-paste-0.22.2` | privado | 2026-11-09 17:43 UTC |
+
+**Fuente observada:** GitHub · **cambio más reciente:** 2026-11-09 17:49 UTC
+<!-- SHEILY_ORG_PROJECTS_END -->
+
 <details>
 <summary>Proyectos y documentación técnica</summary>
 

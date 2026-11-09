@@ -1,0 +1,25 @@
+{
+  "organization": "Sheily-AI",
+  "repositories": [
+    {
+      "name": "SHEILY-COGNITIVA",
+      "label": "SHEILY-COGNITIVA"
+    },
+    {
+      "name": "KV-SHEI",
+      "label": "KV-SHEI / M-SLIM"
+    },
+    {
+      "name": "INICIO",
+      "label": "INICIO"
+    },
+    {
+      "name": "KV-SHEI-tch-rs",
+      "label": "KV-SHEI-tch-rs"
+    },
+    {
+      "name": "KV-SHEI-tokenizador-rust",
+      "label": "KV-SHEI-tokenizador-rust"
+    }
+  ]
+}
