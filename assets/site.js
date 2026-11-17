@@ -3773,6 +3773,31 @@ function scheduleConnectomeRefresh() {
   }, 5000);
 }
 
+function systemObservationHint(observation) {
+  if (observation?.status !== 'rejected') return '';
+  const error = observation.reason;
+  if (error?.code === 'AUTH_REQUIRED') return 'La sesión ha caducado; vuelve a iniciar sesión.';
+  const http = Number(error?.status);
+  if (Number.isInteger(http) && http >= 400 && http <= 599) {
+    return 'La consulta devolvió HTTP ' + http + '. No se ha certificado el contrato de esta conexión.';
+  }
+  return 'La consulta no recibió una respuesta verificable del servidor.';
+}
+
+function systemReadinessHint(observation) {
+  if (observation?.status !== 'fulfilled') return systemObservationHint(observation);
+  const result = observation.value || {};
+  if (result.status === 200 && result.body?.ready === true) return '';
+  const body = result.body || {};
+  const missing = [
+    ['API cognitiva', body.upstream_ready],
+    ['inventario', body.inventory_complete],
+    ['espacio de trabajo', body.workspace_closure_complete],
+  ].filter(([, value]) => value === false).map(([name]) => name);
+  if (missing.length) return 'Sin preparar: ' + missing.join(', ') + '.';
+  return 'La consola no acredita preparación completa (HTTP ' + String(result.status || 'desconocido') + ').';
+}
+
 async function loadSystemStatus() {
   const requestId = ++state.systemRequestId;
   $('system-refresh').disabled = true;
@@ -3826,9 +3851,28 @@ async function loadSystemStatus() {
     ['Servicio de evaluación y promoción TIDEX consultable', tidexReachable],
     ['Entrenador de fuentes canónicas preparado', mb?.training?.canonical_enabled === true ? true : mb?.training?.canonical_enabled === false ? false : null],
   ];
+  const diagnostics = new Map([
+    ['Consola y API SHEILY preparadas', ready ? '' : systemReadinessHint(readiness)],
+    ['Notas con versiones y sustitución atómica accesibles',
+      notesReachable === true ? '' : notes.status === 'rejected'
+        ? systemObservationHint(notes) : 'La respuesta no acredita el contrato de notas y sustitución atómica.'],
+    ['Selección vinculada al sujeto y conversación',
+      sessionScoped === true ? '' : selection.status === 'rejected'
+        ? systemObservationHint(selection) : 'La respuesta no acredita las vinculaciones de identidad y conversación.'],
+    ['Servicio de evaluación y promoción TIDEX consultable',
+      publicPagesBridge ? 'Solo disponible desde la consola administrativa autorizada.' : systemObservationHint(tidex)],
+  ]);
   for (const [label, result] of entries) {
     const row = document.createElement('div'); row.className = 'check-row';
-    const name = document.createElement('span'); name.textContent = label;
+    const name = document.createElement('span'); name.className = 'check-row-name';
+    const heading = document.createElement('span'); heading.textContent = label;
+    name.append(heading);
+    const hint = diagnostics.get(label) || '';
+    if (hint) {
+      const note = document.createElement('small'); note.className = 'check-row-diagnostic';
+      note.textContent = hint;
+      name.append(note);
+    }
     const value = document.createElement('strong'); value.textContent =
       result === true ? 'Comprobado'
       : result === false ? 'Pendiente'
@@ -3836,7 +3880,10 @@ async function loadSystemStatus() {
     row.append(name, value); checks.append(row);
   }
   const checked = entries.filter(([, result]) => result === true).length;
-  $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones comprobadas en esta consulta.'
+  const restricted = entries.filter(([, result]) => result === 'restricted').length;
+  const checkable = entries.length - restricted;
+  $('system-cutover-verdict').textContent = checked + ' de ' + checkable + ' conexiones verificables comprobadas en esta consulta.'
+    + (restricted ? ' ' + restricted + ' conexión restringida por seguridad.' : '')
     + (publicPagesBridge
       ? ' TIDEX y los controles privados no están disponibles desde GitHub Pages; compruébalos en la consola administrativa local.'
       : tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
