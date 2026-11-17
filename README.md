@@ -1,65 +1,38 @@
 # Sheily-AI · guía de la organización
 
-Este repositorio mantiene la [portada pública de Sheily-AI](profile/README.md) y sirve como índice de sus proyectos. La [Wiki de la organización](https://github.com/Sheily-AI/.github/wiki) ofrece una vista de navegación; el código y la documentación versionada de cada proyecto son sus fuentes técnicas.
+Esta carpeta de GitHub mantiene la [portada pública de la organización](profile/README.md) y un índice de sus componentes. No es un panel en tiempo real.
 
-## Índice
+## Áreas de trabajo
 
-- [Mapa de proyectos](#mapa-de-proyectos)
-- [Cómo se relacionan](#cómo-se-relacionan)
-- [Dependencias mantenidas](#dependencias-mantenidas)
-- [Dónde comprobar capacidades y estado](#dónde-comprobar-capacidades-y-estado)
-- [Acceso y colaboración](#acceso-y-colaboración)
-- [Mantenimiento de esta portada](#mantenimiento-de-esta-portada)
-
-## Mapa de proyectos
-
-| Proyecto | Responsabilidad | Puerta de entrada |
+| Área | Repositorios | Alcance |
 | --- | --- | --- |
-| [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) | Sistema cognitivo modular en Rust: interacción, capacidades, inferencia, memoria y gobernanza. | Su README y la documentación de arquitectura y operación. |
-| [KV-SHEI](https://github.com/Sheily-AI/KV-SHEI) | Arquitectura de inferencia y memoria K/V; M-SLIM es el runtime local que ejecuta modelos y conserva continuidad física. | Su README, catálogo de capacidades y contratos de validación. |
-| [INICIO](https://github.com/Sheily-AI/INICIO) | Runtime adaptativo en Python: observación, aprendizaje admitido y cambios estructurales gobernados con evidencia. | Su README, mapa documental y contratos de adaptación. |
+| Cognición | [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) | Solicitudes, turnos, capacidades, memoria, permisos y gobernanza |
+| Adaptación y aprendizaje | [INICIO](https://github.com/Sheily-AI/INICIO), [TIDEX](https://github.com/Sheily-AI/TIDEX) | Observación, evaluación y promoción gobernada |
+| Evidencia externa | [GLOBUS](https://github.com/Sheily-AI/GLOBUS) | Recuperación y conciliación factual |
+| Memoria | [SHEILY-LIFELONG-MEMORY](https://github.com/Sheily-AI/SHEILY-LIFELONG-MEMORY) | Consolidación y candidatos de entrenamiento |
+| Integración y despliegue | [SHEILY-INICIO-CONNECTOR](https://github.com/Sheily-AI/SHEILY-INICIO-CONNECTOR), [SHEILY-DEPLOYMENT-ORCHESTRATOR](https://github.com/Sheily-AI/SHEILY-DEPLOYMENT-ORCHESTRATOR) | Contratos entre sistemas y releases |
+| Interfaces y auditoría | [SHEILY-ANDROID](https://github.com/Sheily-AI/SHEILY-ANDROID), [PROJECT-AUDITOR](https://github.com/Sheily-AI/PROJECT-AUDITOR) | Cliente Android y evidencia técnica |
 
-Los tres repositorios son distintos. La presencia de una capacidad en uno no implica que esté integrada, activada o desplegada en los otros.
+Los enlaces anteriores corresponden a los nueve repositorios funcionales accesibles en la consulta del inventario. Algunos requieren permiso porque son privados.
 
-## Cómo se relacionan
+## Sistemas independientes
 
-```mermaid
-flowchart LR
-    S["SHEILY-COGNITIVA: interacción y capacidades"]
-    I["INICIO: observación y adaptación"]
-    K["KV-SHEI / M-SLIM: inferencia y K/V"]
-    S -. "puente gobernado, si se configura" .-> I
-    S -. "integración solo cuando se pruebe" .-> K
-```
+KV-SHEI / M-SLIM y SHEILY no son la misma arquitectura. KV-SHEI trata inferencia y K/V; SHEILY trata la cognición y sus responsabilidades de producto. No se declara integración, disponibilidad del repositorio ni desplegabilidad sin verificar las fuentes actuales de cada sistema.
 
-SHEILY-COGNITIVA gobierna la interacción y las capacidades de su propio producto. INICIO conserva su runtime y autoridad de adaptación; cualquier puente con SHEILY necesita configuración, identidad y evidencia propias. KV-SHEI/M-SLIM ejecuta inferencia y administra K/V bajo sus contratos. Este mapa describe responsabilidades, no una certificación de una instalación concreta.
+## Niveles de evidencia
 
-## Dependencias mantenidas
+1. **Diseño:** documentación, contratos y límites de cada sistema.
+2. **Implementación:** código asociado a una revisión identificable.
+3. **Validación:** tests y workflows con registros y condiciones verificables.
+4. **Producción:** artefacto, proceso, configuración efectiva y prueba del servicio real.
+5. **Continuidad:** persistencia, recuperación y rollback verificados.
 
-| Repositorio | Uso |
-| --- | --- |
-| [KV-SHEI-tch-rs](https://github.com/Sheily-AI/KV-SHEI-tch-rs) | Fork de tch/torch-sys para el backend LibTorch opcional de KV-SHEI. |
-| [KV-SHEI-tokenizador-rust](https://github.com/Sheily-AI/KV-SHEI-tokenizador-rust) | Fork mantenido de tokenizers para KV-SHEI. |
+Estos niveles no son intercambiables. Una prueba en verde no equivale automáticamente a un servicio funcional.
 
-Cada fork documenta su base upstream, cambio mantenido, validación y límites. No se debe interpretar como un producto independiente ni como una actualización automática de KV-SHEI.
+## Cómo se mantiene esta guía
 
-## Dónde comprobar capacidades y estado
-
-1. **Fuente y contrato:** README, código y documentación versionada del repositorio pertinente.
-2. **Validación:** pruebas y matrices correspondientes a la misma revisión y configuración.
-3. **Operación:** artefacto instalado, configuración efectiva, servicio y petición real cuando la afirmación sea sobre funcionamiento residente.
-4. **Rendimiento:** mediciones físicas comparables, con modelo, hardware y método identificados.
-
-Una página de presentación, un manifiesto, un test aislado o un proceso vivo no sustituyen esas comprobaciones. Los estados observados en documentos pueden caducar; comprueba su fecha y la identidad que enlazan.
-
-## Acceso y colaboración
-
-Este repositorio `.github` y su Wiki son públicos. Los cinco repositorios enlazados arriba son privados actualmente: los enlaces exigen permiso y esta página no publica su código. Los Issues y Pull requests de cada trabajo se gestionan en el repositorio que lo posee.
-
-## Mantenimiento de la guía Markdown
-
-- [`profile/README.md`](profile/README.md) es la presentación de la organización, mantenida como Markdown editorial.
-- Este README conserva el mapa técnico y explica dónde localizar pruebas y documentación. Ninguno de los dos documentos incorpora contadores automáticos.
-- [`profile/catalog.json`](profile/catalog.json) y [`scripts/generate_profile.py`](scripts/generate_profile.py) se conservan por trazabilidad histórica; la tarea periódica que reescribía la portada queda retirada.
-- Las comprobaciones de CI, los mecanismos de proyectos y el almacenamiento de artefactos son independientes de esta documentación y no se desactivan.
-- Si cambian nombres, arquitecturas o enlaces, se actualiza el Markdown con una revisión verificable, evitando atribuir a producción resultados que solo existan en pruebas.
+- [`profile/README.md`](profile/README.md) es la portada visible en GitHub.
+- El Markdown se actualiza por cambios revisados; ningún workflow periódico sobrescribe la portada.
+- [`scripts/generate_profile.py`](scripts/generate_profile.py), [`profile/catalog.json`](profile/catalog.json) y sus pruebas se conservan únicamente por trazabilidad histórica, no como fuente automática de esta portada.
+- GitHub Actions, GitHub Projects y los registros de auditoría siguen siendo mecanismos independientes.
+- Los repositorios retirados o inaccesibles no se anuncian como destinos activos sin verificación nueva.
