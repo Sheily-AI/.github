@@ -3798,7 +3798,13 @@ async function loadSystemStatus() {
   grid.append(runtimeCard('Preparación operativa', ready ? 'Preparada' : readiness.status === 'fulfilled' ? 'Requiere atención' : 'Sin verificar', readiness.status === 'fulfilled' ? 'Estado comunicado por /ready: HTTP ' + readiness.value.status + '. El proceso activo y la preparación completa se comprueban por separado.' : 'No se pudo consultar la preparación.', ready));
   const privateBody = privacy.status === 'fulfilled' ? privacy.value : null;
   const network = privateBody?.network_scope;
-  grid.append(runtimeCard('Acceso y privacidad', network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar', privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.', network === 'LOOPBACK_ONLY'));
+  const publicPagesBridge = Boolean(globalThis.SheilyPagesTransport);
+  grid.append(runtimeCard('Acceso y privacidad',
+    publicPagesBridge ? 'Pasarela HTTPS · núcleo local' : network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar',
+    publicPagesBridge
+      ? 'La consola y los datos siguen en el servidor privado. Este acceso HTTPS tiene sesión de propietario y no habilita administración, bóveda ni TIDEX.'
+      : privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.',
+    publicPagesBridge ? privateBody !== null : network === 'LOOPBACK_ONLY'));
   const mb = lifelongMemory.status === 'fulfilled' ? lifelongMemory.value : null;
   grid.append(runtimeCard('Lifelong Memory', mb?.available === true ? 'Conectado' : mb?.enabled === false ? 'Desactivado' : 'Sin verificar', mb?.available === true ? 'Fuentes y trabajos disponibles mediante SHEILY.' : 'La integración no ha confirmado disponibilidad.', mb?.available === true));
   const checks = $('system-integration-checks'); checks.replaceChildren();
@@ -3807,7 +3813,9 @@ async function loadSystemStatus() {
   const sessionScoped = valueOrUnknown(selection, body => body?.schema === 'shei.llm_session_selection/v1' && body.scope === 'authenticated_owner_conversation' && /^[a-f0-9]{64}$/.test(body.owner_binding || '') && /^[a-f0-9]{64}$/.test(body.session_binding || ''));
   const historyReachable = valueOrUnknown(history, body => body?.read_only === true && Array.isArray(body.turns) && /^[a-f0-9]{64}$/.test(body.history_version || ''));
   const jobsReachable = valueOrUnknown(jobs, body => body?.ok === true && Array.isArray(body.jobs));
-  const tidexReachable = valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
+  const tidexReachable = publicPagesBridge
+    ? 'restricted'
+    : valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
   const entries = [
     ['Consola y API SHEILY preparadas', ready === true ? true : readiness.status === 'fulfilled' ? false : null],
     ['Fuentes originales de Lifelong Memory íntegras', mb?.archive?.integrity?.verified ?? null],
@@ -3821,12 +3829,17 @@ async function loadSystemStatus() {
   for (const [label, result] of entries) {
     const row = document.createElement('div'); row.className = 'check-row';
     const name = document.createElement('span'); name.textContent = label;
-    const value = document.createElement('strong'); value.textContent = result === true ? 'Comprobado' : result === false ? 'Pendiente' : 'No verificado';
+    const value = document.createElement('strong'); value.textContent =
+      result === true ? 'Comprobado'
+      : result === false ? 'Pendiente'
+      : result === 'restricted' ? 'Restringido en web pública' : 'No verificado';
     row.append(name, value); checks.append(row);
   }
   const checked = entries.filter(([, result]) => result === true).length;
   $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones comprobadas en esta consulta.'
-    + (tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
+    + (publicPagesBridge
+      ? ' TIDEX y los controles privados no están disponibles desde GitHub Pages; compruébalos en la consola administrativa local.'
+      : tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
     + ' La verificación de migración y recuperación se documenta en el informe de instalación.';
   $('system-observed').textContent = 'Última consulta: ' + new Date().toLocaleString('es') + '. Cada operación devuelve su propio resultado.';
   $('system-refresh').disabled = false;
