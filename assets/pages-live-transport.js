@@ -14,7 +14,14 @@
     return new URL(raw, root.location.href);
   }
   function isApi(path) { return path.startsWith('/api/'); }
-  function backendUrl(url) { return API_ORIGIN + url.pathname + url.search; }
+  function backendUrl(url) {
+    // The server exposes exact, owner-authenticated aliases for the original
+    // Rust console's health/readiness JSON. Never trust the public tunnel's
+    // own plaintext /health response as cognitive readiness evidence.
+    const pathname = url.pathname === '/health' ? '/api/bridge/health'
+      : url.pathname === '/ready' ? '/api/bridge/ready' : url.pathname;
+    return API_ORIGIN + pathname + url.search;
+  }
   function denied() { return Promise.reject(new Error('Esta operación privada no está habilitada en la web pública. Usa la consola local de SHEILY.')); }
   function guardedFetch(input, init) {
     const options = init || {};
@@ -47,7 +54,7 @@
     if (login && method === 'DELETE') {
       if (bridgeSession) headers.set('X-Sheily-Bridge-Session', bridgeSession);
       bridgeSession = '';
-    } else if (bridgeSession && isApi(url.pathname) && !login) {
+    } else if (bridgeSession && (isApi(url.pathname) || url.pathname === '/health' || url.pathname === '/ready') && !login) {
       headers.set('X-Sheily-Bridge-Session', bridgeSession);
     }
     return originalFetch(backendUrl(url), { ...options, method, headers, credentials: 'omit', mode: 'cors', redirect: 'error', referrerPolicy: 'no-referrer' });
