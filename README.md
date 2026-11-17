@@ -56,29 +56,10 @@ Una página de presentación, un manifiesto, un test aislado o un proceso vivo n
 
 Este repositorio `.github` y su Wiki son públicos. Los cinco repositorios enlazados arriba son privados actualmente: los enlaces exigen permiso y esta página no publica su código. Los Issues y Pull requests de cada trabajo se gestionan en el repositorio que lo posee.
 
-## Mantenimiento de esta portada
+## Mantenimiento de la guía Markdown
 
-- [`profile/README.md`](profile/README.md) es la portada visible en la página principal de la organización.
-- [`scripts/generate_profile.py`](scripts/generate_profile.py) actualiza la región automática usando la lista pública deliberada de [`profile/catalog.json`](profile/catalog.json); no lee ni publica código privado.
-- El workflow `Update organization profile` comprueba cambios cada 15 minutos, puede ejecutarse manualmente y acepta el evento `project-changed` para integraciones inmediatas. GitHub puede retrasar una ejecución programada cuando su plataforma tiene mucha carga.
-- Este `README.md` explica el mapa y las reglas de lectura dentro del repositorio `.github`.
-- La [Wiki](https://github.com/Sheily-AI/.github/wiki) ayuda a navegar, pero no reemplaza la documentación técnica canónica.
-- Cuando cambie la organización de los proyectos, actualiza juntos los nombres, enlaces, límites de acceso y descripciones; no conviertas propuestas o pruebas en hechos de producción.
-
-<!-- SHEILY_CODE_REALITY_START -->
-## Observed technical state
-
-- Local branch: main
-- Observed SHA: 36a1afe4cf29
-- Working tree: clean
-- Code / tests detected: 0 / 0
-- GitHub Actions workflows: 2
-- Execution entrypoints/surfaces: 0
-
-Details are generated from the code rather than manual claims:
-- docs/CODE_REALITY.md
-- docs/EXECUTION_FLOWS.md
-- docs/CI_OPERATIONS.md
-
-This section is an observed snapshot, not a production certification.
-<!-- SHEILY_CODE_REALITY_END -->
+- [`profile/README.md`](profile/README.md) es la presentación de la organización, mantenida como Markdown editorial.
+- Este README conserva el mapa técnico y explica dónde localizar pruebas y documentación. Ninguno de los dos documentos incorpora contadores automáticos.
+- [`profile/catalog.json`](profile/catalog.json) y [`scripts/generate_profile.py`](scripts/generate_profile.py) se conservan por trazabilidad histórica; la tarea periódica que reescribía la portada queda retirada.
+- Las comprobaciones de CI, los mecanismos de proyectos y el almacenamiento de artefactos son independientes de esta documentación y no se desactivan.
+- Si cambian nombres, arquitecturas o enlaces, se actualiza el Markdown con una revisión verificable, evitando atribuir a producción resultados que solo existan en pruebas.
