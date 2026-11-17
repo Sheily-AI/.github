@@ -5,10 +5,10 @@
   if (typeof root.location === 'undefined' || root.location.origin !== 'https://sheily-ai.github.io') return;
   const API_ORIGIN = 'https://yo-venus-series.tail2ed060.ts.net:8443';
   const originalFetch = root.fetch.bind(root);
-  let ownerPassword = '';
+  let bridgeSession = '';
   const PUBLIC_PATH = /^\/(?:api\/|health(?:\/|$)|ready(?:\/|$))/;
   const PRIVATE_PATH = /^\/api\/(?:admin(?:\/|$)|vault(?:\/|$)|tidex(?:\/|$)|auth\/setup(?:\/|$)|workspace(?:\/|$))/;
-  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/.*)?|control\/turns(?:\/.*)?|attachments(?:\/.*)?|memories(?:\/.*)?|settings|privacy|inference\/session-selection(?:\/.*)?|lifelong-memory(?:\/.*)?|overview|meta|artifacts\/download|previews(?:\/.*)?|connectome\/observed|tts\/speak)$/;
+  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/.*)?|control\/(?:turns(?:\/.*)?|access)|attachments(?:\/.*)?|memories(?:\/.*)?|settings|privacy|inference\/session-selection(?:\/.*)?|lifelong-memory(?:\/.*)?|overview|meta|artifacts\/download|previews(?:\/.*)?|connectome\/observed|tts\/speak)$/;
   function sourceUrl(input) {
     const raw = typeof input === 'string' ? input : input && typeof input.href === 'string' ? input.href : input && input.url;
     return new URL(raw, root.location.href);
@@ -33,12 +33,23 @@
       try { candidate = JSON.parse(options.body || '{}').token; }
       catch { return Promise.reject(new Error('Solicitud de acceso inválida.')); }
       if (typeof candidate !== 'string' || candidate.length < 12 || candidate.length > 128) return Promise.reject(new Error('Contraseña inválida. No se ha enviado.')); 
-      ownerPassword = '';
+      bridgeSession = '';
       return originalFetch(backendUrl(url), { ...options, method, headers, credentials: 'omit', mode: 'cors', redirect: 'error', referrerPolicy: 'no-referrer' })
-        .then(response => { if (response.ok) ownerPassword = candidate; return response; });
+        .then(response => {
+          if (response.ok) {
+            const ticket = response.headers.get('X-Sheily-Bridge-Session') || '';
+            if (!/^[A-Za-z0-9_-]{43}$/.test(ticket)) throw new Error('La pasarela no entregó una sesión válida.');
+            bridgeSession = ticket;
+          }
+          return response;
+        });
     }
-    if (login && method === 'DELETE') ownerPassword = '';
-    if (ownerPassword && isApi(url.pathname) && !login) headers.set('X-Console-Token', ownerPassword);
+    if (login && method === 'DELETE') {
+      if (bridgeSession) headers.set('X-Sheily-Bridge-Session', bridgeSession);
+      bridgeSession = '';
+    } else if (bridgeSession && isApi(url.pathname) && !login) {
+      headers.set('X-Sheily-Bridge-Session', bridgeSession);
+    }
     return originalFetch(backendUrl(url), { ...options, method, headers, credentials: 'omit', mode: 'cors', redirect: 'error', referrerPolicy: 'no-referrer' });
   }
   root.fetch = guardedFetch;
@@ -118,7 +129,7 @@
   root.EventSource = AuthorizedEventSource;
   root.SheilyPagesTransport = Object.freeze({
     backendOrigin: API_ORIGIN,
-    isAuthenticated: () => Boolean(ownerPassword),
+    isAuthenticated: () => Boolean(bridgeSession),
   });
 
   if (root.document) root.document.addEventListener('DOMContentLoaded', async () => {
