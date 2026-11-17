@@ -1,0 +1,40 @@
+name: Verify external HTTPS SHEILY owner gateway
+on:
+  push:
+    branches: [feat/sheily-pages-live-bridge-20261117]
+    paths:
+      - .github/workflows/verify-sheily-public-gateway.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check real public TLS, CORS and deny-by-default behavior without secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          origin=https://sheily-ai.github.io
+          server=https://yo-venus-series.tail2ed060.ts.net:8443
+          expected=https://yo-venus-series.tail2ed060.ts.net:8443
+          test "$server" = "$expected"
+          code="$(curl --retry 2 --retry-delay 2 --max-time 20 -sS -o /dev/null -w '%{http_code}' "$server/health")"
+          echo "external_health=$code"
+          test "$code" = 200
+          code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$server/api/auth/status")"
+          echo "external_auth_status=$code"
+          test "$code" = 200
+          code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$server/api/conversations?session_id=personal-owner-v1")"
+          echo "external_unauth_conversations=$code"
+          test "$code" = 401
+          code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$server/api/admin/health")"
+          echo "external_admin_denial=$code"
+          test "$code" = 403
+          code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H 'Origin: https://evil.invalid' "$server/api/auth/status")"
+          echo "external_bad_origin_denial=$code"
+          test "$code" = 403
+          header="$(curl --max-time 15 -sS -D - -o /dev/null -H "Origin: $origin" "$server/api/auth/status")"
+          printf '%s\n' "$header" | grep -iq '^access-control-allow-origin: https://sheily-ai.github.io'
+          printf '%s\n' "$header" | grep -iq '^access-control-expose-headers: .*x-sheily-bridge-session'
+          echo 'PUBLIC_HTTPS_GATEWAY_PROBE=PASS'
