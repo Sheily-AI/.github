@@ -2,7 +2,7 @@
 
 **Inteligencia local · continuidad · evidencia · adaptación gobernada**
 
-Guía Markdown de los proyectos de la organización. No es un panel de estadísticas ni una certificación de producción. El estado real de cada sistema debe comprobarse en su repositorio, CI y evidencias del entorno desplegado.
+Guía Markdown de los proyectos de la organización; la documentación descriptiva no certifica por sí sola su funcionamiento en producción. El estado real de cada sistema debe comprobarse en su repositorio, CI y evidencias del entorno desplegado.
 
 [Repositorios de la organización](https://github.com/orgs/Sheily-AI/repositories) · [Proyecto de organización](https://github.com/orgs/Sheily-AI/projects/1) · [Documentación técnica](https://github.com/Sheily-AI/.github/wiki)
 
