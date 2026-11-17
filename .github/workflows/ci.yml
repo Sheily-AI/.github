@@ -10,7 +10,10 @@ permissions:
 
 jobs:
   workflows:
-    runs-on: ubuntu-latest
+    # This repository is public. GitHub blocks org self-hosted runner groups
+    # from public repositories by default; standard hosted runners are free
+    # for public repositories and isolate untrusted pull-request code.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - name: Parse workflow files
@@ -28,7 +31,7 @@ jobs:
               print(path)
           PY
   profile-generator:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
       - name: Test profile generator
