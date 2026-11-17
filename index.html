@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#355f4f">
+  <meta name="description" content="Tu espacio personal con SHEILY para pensar, crear y avanzar.">
+  <title>SHEILY · Tu espacio personal</title>
+  <link rel="stylesheet" href="./assets/site.css">
+  <link rel="stylesheet" href="./assets/workspace.css">
+  <script defer src="./assets/vendor/markdown-it.min.js"></script>
+  <script defer src="./assets/vendor/fflate.min.js"></script>
+  <script defer src="./assets/vendor/highlight.min.js"></script>
+  <script defer src="./assets/results.js"></script>
+  <script defer src="./assets/memory-export.js"></script>
+  <script defer src="./assets/uploads.js"></script>
+  <script defer src="./assets/pages-guard.js"></script>
+  <script defer src="./assets/site.js"></script>
+</head>
+<body>
+  <details id="sheily-pages-status" open style="position:fixed;z-index:999999;left:12px;right:12px;bottom:12px;max-width:640px;padding:10px 14px;border:1px solid #a9bdb1;border-radius:12px;background:#172e26;color:#fff;box-shadow:0 6px 20px #0005;font:14px/1.45 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:700">SHEILY · interfaz pública, motor no conectado</summary><p style="margin:8px 0 0">Esta copia sirve la interfaz real desde GitHub Pages. El servidor cognitivo, el historial y las acciones no están disponibles aquí. Por seguridad, las peticiones de autenticación se bloquean hasta disponer de una pasarela HTTPS validada. No introduzcas claves en esta vista.</p></details>
+  <div class="app-shell" id="app-shell" hidden>
+    <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+      <div class="brand-row">
+        <a class="brand" href="./" aria-label="SHEILY, inicio">
+          <span class="brand-mark" aria-hidden="true">S</span>
+          <span class="brand-copy"><strong>SHEILY</strong><small>Espacio personal</small></span>
+        </a>
+        <button class="icon-button sidebar-close" id="sidebar-close" type="button" aria-label="Cerrar menú">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <button class="new-chat" id="new-chat" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva conversación
+      </button>
+
+      <nav class="main-nav" aria-label="Secciones de SHEILY">
+        <p class="nav-section-label">Trabajo</p>
+        <button type="button" data-view="chat" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/></svg>
+          <span>Conversación</span>
+        </button>
+        <button type="button" data-view="conversations">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+          <span>Historial</span>
+          <span class="nav-count" id="conversation-count">0</span>
+        </button>
+        <button type="button" data-view="documents">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/></svg>
+          <span>Documentos</span>
+        </button>
+        <button type="button" data-view="memory">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6a2 2 0 0 1 2 2v1a3 3 0 0 1 3 3v2a3 3 0 0 1 0 6v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1a3 3 0 0 1 0-6V9a3 3 0 0 1 3-3V5a2 2 0 0 1 2-2Z"/><path d="M9 3v18M15 3v18"/></svg>
+          <span>Memoria y versiones</span>
+        </button>
+        <button type="button" data-view="learning">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM5 10v6c4 4 10 4 14 0v-6M21 8v8"/></svg>
+          <span>Aprendizaje</span><small class="nav-subsystem">Lifelong Memory</small>
+        </button>
+        <p class="nav-section-label">Control</p>
+        <button type="button" data-view="system">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>
+          <span>Estado del sistema</span>
+        </button>
+        <button type="button" data-view="admin">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM9 12l2 2 4-4"/></svg>
+          <span>Administración</span>
+        </button>
+        <button type="button" data-view="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6 1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+          <span>Ajustes</span>
+        </button>
+      </nav>
+
+      <section class="sidebar-recent" id="sidebar-recent" aria-label="Conversaciones recientes" hidden><h2>Recientes</h2><div id="recent-conversations"></div></section>
+      <div class="sidebar-spacer"></div>
+      <button class="privacy-note privacy-vault-btn" id="private-vault-trigger" type="button" data-view="vault" aria-label="Abrir Custodia Privada protegida con contraseña">
+        <span class="vault-trigger-icon" id="vault-sidebar-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </span>
+        <div class="vault-trigger-copy">
+          <strong>Custodia Privada</strong>
+          <span id="vault-sidebar-subtitle">Solo para ti</span>
+        </div>
+        <span class="vault-trigger-pill" id="vault-sidebar-pill">🔒</span>
+      </button>
+      <button class="profile-button" type="button" data-view="settings">
+        <span class="avatar" id="sidebar-avatar">S</span>
+        <span><strong id="sidebar-profile-name">Usuario</strong><small id="connection-label">Conectando…</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </aside>
+
+    <div class="mobile-scrim" id="mobile-scrim"></div>
+
+    <main class="main" id="main-content">
+      <a class="skip-link" href="#page-title">Ir al contenido</a>
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menu-button" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="topbar-title">
+          <strong id="page-title" tabindex="-1">Nueva conversación</strong>
+          <span class="availability" id="availability"><i></i><span id="availability-label">Conectando…</span></span>
+        </div>
+        <div class="mode-selector-wrap" id="mode-selector-wrap">
+          <label class="sr-only" for="cognitive-mode">Modo cognitivo</label>
+          <select class="mode-select" id="cognitive-mode" title="Modo de respuesta de SHEILY">
+            <option value="balanced" selected>Equilibrado</option>
+            <option value="fast">Respuesta breve</option>
+            <option value="deep">Explicación detallada</option>
+          </select>
+        </div>
+        <button class="context-inspector-toggle" id="context-inspector-open" type="button" aria-expanded="false" aria-controls="context-inspector-panel" title="Examinar contexto y controles reales">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-5 4 10 2-5h7"/><circle cx="12" cy="12" r="9"/></svg>
+          <span>Contexto</span>
+        </button>
+        <button class="icon-button theme-button" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">◐</button>
+        <button class="icon-button" id="new-chat-mobile" type="button" aria-label="Nueva conversación">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </header>
+
+      <aside id="context-inspector-panel" class="context-inspector-panel" aria-label="Inspector de contexto y privacidad" hidden>
+        <div class="context-inspector-heading">
+          <div><p class="eyebrow">CONTROL PERSONAL</p><h2>Contexto verificable</h2><p>Datos consultados al servidor. No representa pensamiento interno.</p></div>
+          <button class="icon-button" id="context-inspector-close" type="button" aria-label="Cerrar inspector">✕</button>
+        </div>
+        <div id="context-inspector-status" class="context-inspector-status" role="status" aria-live="polite">Pulsa actualizar para consultar el estado.</div>
+        <div id="context-inspector-content" class="context-inspector-content"></div>
+        <div class="context-inspector-actions">
+          <button class="secondary-button" id="context-inspector-refresh" type="button">Actualizar evidencia</button>
+          <button class="secondary-button" id="context-inspector-report" type="button" disabled>Informe del último turno</button>
+          <button class="secondary-button" id="context-inspector-memory" type="button">Gestionar memorias</button>
+          <button class="secondary-button" id="context-inspector-documents" type="button">Mis documentos</button>
+          <button class="secondary-button" id="context-inspector-vault" type="button">Abrir espacio privado</button>
+        </div>
+      </aside>
+
+      <section class="view chat-view is-active" id="view-chat" data-page="chat">
+        <div class="message-scroll" id="message-scroll">
+          <div class="welcome" id="welcome">
+            <div class="welcome-mark" aria-hidden="true">
+              <span>S</span>
+            </div>
+            <p class="eyebrow">TU ESPACIO PERSONAL</p>
+            <h1>¿Qué vamos a crear?</h1>
+            <p class="welcome-copy">Piensa, investiga y crea. Tus resultados, junto a la conversación.</p>
+          </div>
+          <div class="messages" id="messages" role="log" aria-live="polite"></div>
+        </div>
+
+        <div class="composer-area" id="chat-dropzone">
+          <div class="handsfree-hud" id="handsfree-hud" hidden>
+            <div class="handsfree-wave">
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+            </div>
+            <div class="handsfree-status" id="handsfree-status-text">Escuchando... Habla cuando quieras</div>
+            <button class="handsfree-stop-btn" id="handsfree-stop-btn" type="button" title="Desactivar modo manos libres">Detener</button>
+          </div>
+          <form class="composer" id="chat-form">
+            <div class="attachment-tray" id="attachment-tray" hidden>
+              <div class="attachment-chips" id="attachment-chips"></div>
+            </div>
+            <label class="sr-only" for="message">Mensaje para SHEILY</label>
+            <textarea id="message" rows="1" maxlength="131072" placeholder="Escribe una idea, una pregunta o adjunta archivos…" required></textarea>
+            <div class="composer-footer">
+              <div class="composer-tools">
+                <input type="file" id="file-attachment-input" multiple hidden>
+                <button class="tool-button" id="attach-file-button" type="button" aria-label="Adjuntar archivo o código" title="Adjuntar archivo o código">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <button class="tool-button" id="voice-input-button" type="button" aria-label="Dictar por voz" title="Dictar por voz">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+                </button>
+                <button class="tool-button handsfree-toggle-btn" id="handsfree-voice-button" type="button" aria-label="Modo Conversación Manos Libres (Alt+V)" title="Modo Conversación Manos Libres (Alt+V)">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/><circle cx="18" cy="6" r="3" fill="currentColor"/></svg>
+                  <span>Manos Libres</span>
+                </button>
+                <label class="reply-delivery" for="reply-delivery">
+                  <span class="sr-only">Cómo responde Sheily</span>
+                  <select id="reply-delivery" title="Cómo responde Sheily">
+                    <option value="both">Texto y voz</option>
+                    <option value="text">Solo texto</option>
+                    <option value="voice">Solo voz</option>
+                  </select>
+                </label>
+                <div class="composer-hint">Enter para enviar · Shift + Enter para nueva línea</div>
+              </div>
+              <button class="send-button" id="send" type="submit" aria-label="Enviar mensaje">
+                <span>Enviar</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+              </button>
+            </div>
+          </form>
+          <div class="drop-overlay" id="drop-overlay" hidden>
+            <div class="drop-target">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <strong>Suelta archivos aquí</strong>
+              <span>Código, texto, Markdown, JSON o datos</span>
+            </div>
+          </div>
+          <p class="disclaimer">SHEILY puede equivocarse. Comprueba la información importante.</p>
+        </div>
+      </section>
+
+      <section class="view content-view" id="view-conversations" data-page="conversations" hidden>
+        <div class="content-head">
+          <div><p class="eyebrow">CONTINUIDAD</p><h1>Tus conversaciones</h1><p>Retoma tus conversaciones y consulta sus entregas y estados conservados.</p></div>
+          <div class="head-actions">
+            <button class="secondary-button" id="conversation-refresh" type="button">Actualizar</button>
+            <button class="secondary-button" id="export-history" type="button">Exportar historial</button>
+            <button class="primary-button" type="button" data-new-chat>+ Nueva conversación</button>
+          </div>
+        </div>
+        <label class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <span class="sr-only">Buscar conversaciones</span>
+          <input id="conversation-search" type="search" placeholder="Buscar en tus conversaciones">
+        </label>
+        <p class="section-status" id="conversation-status" role="status" aria-live="polite">Pendiente de consultar.</p>
+        <div class="conversation-list" id="conversation-list"></div>
+        <div class="empty-state" id="conversation-empty" hidden>
+          <span class="empty-icon">S</span>
+          <h2>Todavía no hay conversaciones</h2>
+          <p>Cuando hables con SHEILY, tus conversaciones aparecerán aquí.</p>
+          <button class="primary-button" type="button" data-new-chat>Empezar ahora</button>
+        </div>
+      </section>
+
+      <section class="view content-view" id="view-documents" data-page="documents" hidden>
+        <div class="content-head">
+          <div><p class="eyebrow">ARCHIVOS VERIFICABLES</p><h1>Documentos de esta conversación</h1>
+          <p>Originales guardados para el chat actual. Su carga no implica memorización permanente ni acceso a Custodia Privada.</p></div>
+          <div class="head-actions">
+            <button class="secondary-button" id="documents-refresh" type="button">Actualizar</button>
+            <button class="primary-button" id="documents-upload" type="button">+ Adjuntar al chat</button>
+          </div>
+        </div>
+        <p class="documents-status" id="documents-status" role="status" aria-live="polite">Abre la conversación para consultar sus archivos.</p>
+        <div class="documents-list" id="documents-list"></div>
+        <div class="empty-state compact" id="documents-empty" hidden>
+          <span class="empty-icon">▤</span><h2>No hay documentos guardados en este chat</h2>
+          <p>Adjunta un archivo y envía el mensaje. El servidor conservará un recibo de integridad SHA-256 asociado a la conversación.</p>
+        </div>
+      </section>
+
+      <section class="view content-view" id="view-memory" data-page="memory" hidden>
+        <div class="content-head">
+          <div><p class="eyebrow">CONTEXTO PERSONAL</p><h1>Memoria y versiones</h1><p>Consulta y controla lo que SHEILY puede recuperar sobre ti y tu trabajo.</p></div>
+          <div class="head-actions"><button class="secondary-button" id="export-memory" type="button">Copia de memoria · ZIP</button></div>
+        </div>
+        <nav class="section-tabs" data-section-tabs="memory" role="tablist" aria-label="Memoria personal">
+          <button id="memory-tab-notes" type="button" role="tab" data-tab="notes" aria-controls="memory-notes-panel" aria-selected="true">Notas y versiones</button>
+          <button id="memory-tab-recovered" type="button" role="tab" data-tab="recovered" aria-controls="memory-recovered-panel" aria-selected="false" tabindex="-1">Memoria recuperable</button>
+        </nav>
+        <div id="memory-notes-panel" class="workspace-panel" data-tab-panel="memory:notes" role="tabpanel" aria-labelledby="memory-tab-notes">
+          <div class="workspace-intro"><h2>Conocimiento que tú mantienes</h2><p>Escribe una nota, consulta su historial o sustituye varias notas por una nueva. Los originales anteriores conservan su procedencia y dejan de competir con la versión vigente.</p></div>
+          <div class="section-toolbar">
+            <label class="search-box"><span class="sr-only">Buscar en las notas cargadas</span><input id="notes-search" type="search" placeholder="Buscar en las notas cargadas"></label>
+            <button class="secondary-button" id="notes-refresh" type="button">Actualizar</button>
+            <button class="primary-button" id="note-new" type="button" disabled>+ Nueva nota</button>
+          </div>
+          <div class="note-filter-row"><label class="check-label"><input id="notes-include-history" type="checkbox"> Mostrar notas sustituidas</label><span id="notes-scope" class="scope-label">Ámbito pendiente de verificar</span></div>
+          <p id="notes-status" class="section-status" role="status" aria-live="polite">Pendiente de consultar.</p>
+          <div class="selection-bar" id="notes-selection-bar" hidden><span id="notes-selected-count"></span><button id="notes-merge" class="primary-button" type="button">Sustituir por una nueva nota</button><button id="notes-clear-selection" class="secondary-button" type="button">Quitar selección</button></div>
+          <div id="notes-list" class="notes-list"></div>
+          <button class="secondary-button" id="notes-more" type="button" hidden>Cargar más notas</button>
+        </div>
+        <div id="memory-recovered-panel" class="workspace-panel" data-tab-panel="memory:recovered" role="tabpanel" aria-labelledby="memory-tab-recovered" hidden>
+        <div class="memory-hero">
+          <div class="memory-orb" aria-hidden="true"><span></span></div>
+          <div>
+            <span class="status-pill" id="memory-status"><i></i>Comprobando</span>
+            <h2>Recuerdos bajo tu control</h2>
+            <p>Aquí se muestran conocimientos, experiencias y procedimientos de la memoria principal que SHEILY puede recuperar en conversaciones futuras. No son lo mismo que el historial de chats.</p>
+            <p class="memory-summary" id="memory-summary">Comprobando recuerdos guardados…</p>
+            <p class="memory-summary" id="memory-counts"></p>
+            <p class="memory-export-note">La copia incluye el contenido completo de la memoria principal recuperable, su procedencia y un lector sin conexión. No es una copia de seguridad de todo Sheily.</p>
+            <p class="memory-summary" id="memory-export-status" role="status"></p>
+          </div>
+        </div>
+        <div class="memory-toolbar">
+          <label class="search-box memory-search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <span class="sr-only">Buscar recuerdos</span>
+            <input id="memory-search" type="search" placeholder="Buscar en tus recuerdos">
+          </label>
+          <label class="memory-filter"><span class="sr-only">Tipo de recuerdo</span><select id="memory-kind"><option value="all">Todos</option><option value="semantic">Conocimientos</option><option value="episodic">Experiencias</option><option value="procedural">Procedimientos</option><option value="failure">Fallos y Antipatrones</option><option value="prospective">Prospectiva</option><option value="autobiographical">Autobiográfica</option><option value="implicit">Implícita</option></select></label>
+        </div>
+        <div class="memory-list" id="memory-list" aria-live="polite"></div>
+        <button type="button" id="memory-load-more" class="secondary-button" hidden>Cargar más recuerdos</button>
+        <div class="empty-state compact" id="memory-empty" hidden><span class="empty-icon">S</span><h2>No hay recuerdos</h2><p id="memory-empty-copy">SHEILY todavía no conserva recuerdos cognitivos en este espacio.</p></div>
+        <aside class="memory-explainer"><strong>Qué ocurre al olvidar</strong><p>El recuerdo deja de estar disponible para futuras respuestas y también se bloquean sus dependencias. El registro técnico mínimo de auditoría se conserva para demostrar que el olvido se aplicó; no vuelve a utilizarse como memoria. Esta vista no mezcla telemetría ni registros de auditoría con tus recuerdos.</p></aside>
+
+        </div>
+      </section>
+
+      <section class="view content-view learning-view" id="view-learning" data-page="learning" hidden>
+        <div class="content-head"><div><p class="eyebrow">APRENDIZAJE</p><h1>De tus fuentes a un candidato</h1><p>Selecciona conocimiento, define una comprobación y sigue el resultado. La aplicación al modelo se autoriza y verifica por separado.</p></div></div>
+        <div id="learning-access-notice" class="access-notice" role="status">Comprobando los permisos de aprendizaje…</div>
+        <section class="lifelong-memory-panel" aria-labelledby="lifelong-memory-title">
+          <div class="lifelong-memory-panel-head">
+            <div><p class="eyebrow">SUBSISTEMA DE SHEILY</p><h2 id="lifelong-memory-title">Lifelong Memory · Aprendizaje verificable</h2></div>
+            <button class="secondary-button" id="lifelong-memory-refresh" type="button">Actualizar</button>
+          </div>
+          <p id="lifelong-memory-status" class="lifelong-memory-status" role="status" aria-live="polite">Pendiente de consultar.</p>
+          <p id="lifelong-memory-summary" class="lifelong-memory-copy">Consulta las fuentes conservadas y los trabajos de aprendizaje desde este espacio.</p>
+          <dl class="lifelong-memory-metrics">
+            <div><dt>Fuentes conservadas</dt><dd id="lifelong-memory-source-count">No medido</dd></div>
+            <div><dt>Turnos conservados</dt><dd id="lifelong-memory-turn-count">No medido</dd></div>
+            <div><dt>Integridad</dt><dd id="lifelong-memory-integrity">Sin verificar</dd></div>
+          </dl>
+          <p id="lifelong-memory-integration-note" class="lifelong-memory-copy"></p>
+          <details class="inference-selector" id="inference-selection-panel">
+            <summary><span>Modelo de esta conversación</span><small id="inference-current-summary">Selección pendiente de consultar</small></summary>
+            <div class="inference-selector-body">
+              <p id="inference-selection-current" class="section-status">Todavía no se ha consultado la selección del servidor.</p>
+              <p id="inference-permission" class="section-status"></p>
+              <div class="section-toolbar">
+                <label class="inference-option-label" for="inference-option"><span>Opciones autorizadas por TIDEX</span><select id="inference-option" disabled><option value="">Elige una opción autorizada</option></select></label>
+                <button class="secondary-button" type="button" id="inference-refresh">Consultar selección</button>
+              </div>
+              <p class="section-status" id="inference-options-note"></p>
+              <div class="head-actions">
+                <button class="primary-button" type="button" id="inference-apply" disabled>Aplicar a nuevos turnos</button>
+                <button class="secondary-button" type="button" id="inference-inherit" disabled>Volver a selección general</button>
+              </div>
+              <p id="inference-status" class="section-status" role="status" aria-live="polite"></p>
+              <p id="inference-readiness" class="section-status">La selección no certifica la disponibilidad del modelo ni activa candidatos sin autorización.</p>
+            </div>
+          </details>
+                    <nav class="section-tabs" data-section-tabs="learning" role="tablist" aria-label="Aprendizaje Lifelong Memory">
+            <button id="learning-tab-sources" type="button" role="tab" data-tab="sources" aria-controls="learning-sources-panel" aria-selected="true">Fuentes e historial</button>
+            <button id="learning-tab-training" type="button" role="tab" data-tab="training" aria-controls="learning-training-panel" aria-selected="false" tabindex="-1">Preparar candidato</button>
+            <button id="learning-tab-jobs" type="button" role="tab" data-tab="jobs" aria-controls="learning-jobs-panel" aria-selected="false" tabindex="-1">Trabajos y adaptadores</button>
+          </nav>
+          <div class="workspace-panel" id="learning-sources-panel" data-tab-panel="learning:sources" role="tabpanel" aria-labelledby="learning-tab-sources">
+            <div class="section-toolbar"><label class="search-box"><span class="sr-only">Buscar fuentes cargadas</span><input id="lifelong-memory-source-search" type="search" placeholder="Buscar en las fuentes cargadas"></label><button class="primary-button" id="lifelong-memory-go-training" type="button">Configurar entrenamiento</button></div>
+            <p class="lifelong-memory-copy">Las fuentes heredadas conservan su procedencia. La selección para entrenar sólo se habilita cuando SHEILY permite crear un candidato.</p>
+            <p id="lifelong-memory-sources-status" class="lifelong-memory-copy" role="status">Pendiente de consultar.</p>
+            <div id="lifelong-memory-sources" class="lifelong-memory-sources"></div>
+                    <section id="lifelong-memory-source-reader" class="lifelong-memory-source-reader" aria-labelledby="lifelong-memory-source-title" hidden>
+            <div class="lifelong-memory-panel-head"><h3 id="lifelong-memory-source-title">Fuente completa</h3><button id="lifelong-memory-source-close" class="secondary-button" type="button">Cerrar lectura</button></div>
+            <p id="lifelong-memory-source-detail" class="lifelong-memory-copy"></p>
+            <pre id="lifelong-memory-source-text" tabindex="0"></pre>
+            <button id="lifelong-memory-source-attach" class="primary-button" type="button" disabled>Usar en esta conversación</button>
+          </section>
+            <section class="workspace-card archive-history" aria-labelledby="lifelong-memory-history-heading">
+              <div class="section-heading"><div><p class="eyebrow">PROCEDENCIA CONSERVADA</p><h3 id="lifelong-memory-history-heading">Conversaciones de Lifelong Memory</h3></div><button class="secondary-button" id="lifelong-memory-history-refresh" type="button">Consultar historial</button></div>
+              <p id="lifelong-memory-history-status" class="section-status" role="status">Consulta el historial conservado. No modifica las conversaciones de SHEILY.</p>
+              <div id="lifelong-memory-history-list" class="archive-turn-list"></div>
+              <button class="secondary-button" id="lifelong-memory-history-more" type="button" hidden>Cargar más turnos</button>
+            </section>
+          </div>
+
+                    <div class="workspace-panel" id="learning-training-panel" data-tab-panel="learning:training" role="tabpanel" aria-labelledby="learning-tab-training" hidden>
+            <p id="lifelong-memory-training-policy" class="lifelong-memory-copy">Pendiente de comprobar la disponibilidad.</p>
+            <div class="workspace-card training-source-selection">
+              <h3>1. Elige el origen del conocimiento</h3>
+              <fieldset class="source-mode-options"><legend class="sr-only">Origen de las fuentes</legend>
+                <label><input type="radio" name="lifelong-memory-source-mode" value="archive" checked> Fuentes conservadas de Lifelong Memory</label>
+                <label><input type="radio" name="lifelong-memory-source-mode" value="canonical" id="lifelong-memory-canonical-mode" disabled> Notas vigentes de SHEILY</label>
+              </fieldset>
+              <p id="lifelong-memory-archive-selection-note" class="section-status">Selecciona los originales en la pestaña Fuentes e historial. Se conservará una instantánea de los documentos elegidos.</p>
+              <div id="lifelong-memory-canonical-controls" hidden>
+                <div class="section-heading"><p id="lifelong-memory-canonical-status" class="section-status" role="status">Consulta las notas para verificar sus revisiones.</p><button type="button" class="secondary-button" id="lifelong-memory-canonical-refresh">Consultar notas</button></div>
+                <div id="lifelong-memory-canonical-sources" class="canonical-source-list"></div>
+                <p class="section-status">SHEILY obtiene el original desde su memoria y comprueba su versión. Esta operación usa referencias a las notas; no convierte los resúmenes en material de entrenamiento.</p>
+              </div>
+            </div>
+            <form id="lifelong-memory-training-form" class="lifelong-memory-training-form">
+              <h3>2. Define qué quieres comprobar</h3>
+              <fieldset id="lifelong-memory-training-fields" disabled>
+                <legend class="sr-only">Crear un candidato de aprendizaje</legend>
+                <p id="lifelong-memory-selected-count" class="lifelong-memory-copy">Selecciona las fuentes que quieras usar en el listado anterior.</p>
+                <label>Pregunta de entrenamiento<textarea id="lifelong-memory-train-question" rows="2" required></textarea></label>
+                <label>Respuesta esperada<textarea id="lifelong-memory-expected-answer" rows="2" required></textarea></label>
+                <label>Pregunta de validación<textarea id="lifelong-memory-validation-question" rows="2" required></textarea></label>
+                <label class="lifelong-memory-steps-label">Límite de pasos<input id="lifelong-memory-max-steps" type="number" min="1" step="1" inputmode="numeric" required></label>
+                <p class="lifelong-memory-copy">Crear un candidato no lo activa en las respuestas. Su evaluación y promoción se comprueban por separado.</p>
+                <button id="lifelong-memory-train-submit" class="primary-button" type="submit">Crear candidato</button>
+              </fieldset>
+            </form>
+            <p id="lifelong-memory-training-result" class="lifelong-memory-copy" role="status" aria-live="polite"></p>
+
+          </div>
+                    <div class="workspace-panel" id="learning-jobs-panel" data-tab-panel="learning:jobs" role="tabpanel" aria-labelledby="learning-tab-jobs" hidden>
+            <p id="lifelong-memory-jobs-status" class="lifelong-memory-copy" role="status">Pendiente de consultar.</p>
+            <div id="lifelong-memory-jobs" class="lifelong-memory-jobs"></div>
+
+            <section id="lifelong-memory-job-reader" class="workspace-card job-reader" aria-labelledby="lifelong-memory-job-title" hidden>
+              <div class="section-heading"><h3 id="lifelong-memory-job-title">Detalle del trabajo</h3><button class="secondary-button" id="lifelong-memory-job-close" type="button">Cerrar detalle</button></div>
+              <p id="lifelong-memory-job-status" class="section-status" role="status"></p>
+              <dl id="lifelong-memory-job-facts" class="fact-grid"></dl>
+              <div id="lifelong-memory-job-warnings" class="notice-list"></div>
+              <div id="lifelong-memory-job-actions" class="head-actions"></div>
+            </section>
+            <section id="tidex-control" class="workspace-card tidex-control" aria-labelledby="tidex-heading" hidden>
+              <div class="section-heading"><div><p class="eyebrow">EVALUACIÓN Y AUTORIZACIÓN</p><h3 id="tidex-heading">Comprobar el candidato</h3></div><button id="tidex-close" type="button" class="secondary-button">Cerrar evaluación</button></div>
+              <p id="tidex-status" class="section-status" role="status" aria-live="polite">Pendiente de consultar.</p>
+              <div class="head-actions"><button id="tidex-refresh" type="button" class="secondary-button">Consultar operaciones</button></div>
+              <div id="tidex-operations" class="head-actions"></div>
+              <dl id="tidex-result" class="fact-grid"></dl>
+              <div id="tidex-blockers" class="notice-list"></div>
+              <details class="tidex-suite-editor"><summary>Preparar una evaluación independiente</summary>
+                <p class="section-status">Usa preguntas nuevas y respuestas verificables. Cada comprobación mide el conocimiento adquirido, una capacidad que debe conservarse y una pregunta donde no debe revelar el dato aprendido. Las preguntas de entrenamiento y validación no se pueden reutilizar aquí.</p>
+                <p class="section-status">Puedes ejecutar una evaluación pequeña para observar su resultado. La autorización exige suficientes fuentes y comprobaciones en todas las fases; una prueba parcial no habilita la promoción.</p>
+                <div id="tidex-cases" class="tidex-cases"></div>
+                <div class="head-actions"><button id="tidex-add-case" type="button" class="secondary-button" disabled>Añadir comprobación</button><button id="tidex-evaluate" type="button" class="primary-button" disabled>Evaluar candidato</button></div>
+              </details>
+              <div class="head-actions"><button id="tidex-promote" type="button" class="primary-button" disabled>Solicitar promoción verificada</button><button id="tidex-register" type="button" class="primary-button" disabled hidden>Añadir a mis adaptadores</button></div>
+              <p class="section-status">Tras una promoción confirmada, añade el candidato a tus adaptadores y elígelo en «Modelo de esta conversación» cuando quieras utilizarlo. Cada paso mostrará la confirmación del servidor.</p>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <section class="view content-view vault-view" id="view-vault" data-page="vault" hidden>
+        <div class="vault-gate" id="vault-gate">
+          <div class="vault-gate-card">
+            <div class="vault-emblem" aria-hidden="true">
+              <div class="vault-emblem-ring"></div>
+              <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1.5"/></svg>
+            </div>
+            <p class="eyebrow" id="vault-gate-eyebrow">ESPACIO PERSONAL PROTEGIDO</p>
+            <h1 id="vault-gate-title">Custodia Privada</h1>
+            <p class="vault-gate-copy" id="vault-gate-copy">
+              Introduce tu contraseña personal de <strong>exactamente 8 caracteres (combinando letras y números)</strong> para entrar en tu Custodia Privada de fotos, vídeos, audios, contraseñas, direcciones web, chats, apuntes y archivos.
+            </p>
+            <form class="vault-auth-form" id="vault-auth-form" autocomplete="off">
+              <div class="vault-pin-slots" id="vault-pin-slots" aria-hidden="true">
+                <span>•</span><span>•</span><span>•</span><span>•</span><span>•</span><span>•</span><span>•</span><span>•</span>
+              </div>
+              <div class="vault-input-wrap">
+                <label class="sr-only" for="vault-passcode-input">Contraseña de 8 caracteres (letras y números)</label>
+                <input
+                  id="vault-passcode-input"
+                  type="password"
+                  maxlength="8"
+                  minlength="8"
+                  placeholder="Ej: Sheily26"
+                  autocomplete="off"
+                  spellcheck="false"
+                  required
+                >
+                <button class="vault-eye-btn" id="vault-passcode-toggle" type="button" aria-label="Mostrar u ocultar contraseña">Ver</button>
+              </div>
+              <div class="vault-rules" id="vault-rules">
+                <span class="vault-rule" id="vault-rule-len"><i></i>8 caracteres exactos (0/8)</span>
+                <span class="vault-rule" id="vault-rule-alpha"><i></i>Incluye letras (A-Z)</span>
+                <span class="vault-rule" id="vault-rule-num"><i></i>Incluye números (0-9)</span>
+              </div>
+              <div class="vault-hint-wrap" id="vault-hint-field-wrap" hidden style="margin-top: 10px; text-align: left;">
+                <label for="vault-passcode-hint-input" style="font-size: 11px; color: #a9beae;">Pista recordatoria de contraseña (opcional):</label>
+                <input id="vault-passcode-hint-input" type="text" placeholder="Ej: Nombre de mascota + año" maxlength="60" style="width: 100%; margin-top: 4px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.25); color: #fff; font-size: 13px;">
+              </div>
+              <p class="vault-hint-display" id="vault-hint-display" hidden style="font-size: 12px; color: #6ee7b7; margin: 10px 0 4px;"></p>
+              <p class="form-error" id="vault-auth-error" role="alert" style="margin: 10px 0; font-size: 12px; line-height: 1.4; color: #fca5a5; font-weight: 500;"></p>
+              <button class="primary-button vault-unlock-submit" id="vault-auth-submit" type="submit">
+                Desbloquear Custodia Privada
+              </button>
+            </form>
+            <button class="secondary-button" id="vault-status-refresh" type="button">Volver a comprobar acceso</button>
+            <p class="vault-security-warning">Seguridad actual: clave obligatoria de 8 caracteres y cifrado administrado por el servidor. No se ha certificado cifrado de extremo a extremo. Evita custodiar credenciales críticas hasta completar la migración criptográfica.</p>
+            <div class="vault-gate-features">
+              <span>📸 Fotos y Vídeos</span>
+              <span>🔑 Contraseñas</span>
+              <span>🌐 Direcciones Web</span>
+              <span>💬 Chats y Apuntes</span>
+              <span>🎙️ Audios y Archivos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="vault-workspace" id="vault-workspace" hidden>
+          <div class="vault-hero">
+            <div class="vault-hero-main">
+              <div class="vault-hero-badges">
+                <span class="status-pill positive"><i></i>Custodia abierta · Sesión autorizada</span>
+                <span class="vault-security-tag" id="vault-autolock-badge">Auto-bloqueo: sin verificar</span>
+              </div>
+              <h1>Tu Custodia Privada</h1>
+              <p>Archivos y apuntes bajo tu contraseña. Solo se comparten con la conversación cuando lo autorizas.</p>
+              <div class="vault-policy-notice">
+                <strong>Fuera de memoria y aprendizaje por defecto.</strong>
+                <span>El uso temporal o la memorización requieren una autorización separada.</span>
+              </div>
+              <p class="vault-security-warning">Cifrado administrado por el servidor. El cambio de clave se bloquea cuando hay contenido hasta disponer de una migración transaccional segura.</p>
+              <div class="vault-metrics" id="vault-metrics">
+                <div class="vault-metric"><strong id="vault-stat-total">0</strong><span>Elementos guardados</span></div>
+                <div class="vault-metric"><strong id="vault-stat-pinned">0</strong><span>Destacados 📌</span></div>
+                <div class="vault-metric"><strong id="vault-stat-size">0 KB</strong><span>Almacenamiento privado</span></div>
+                <div class="vault-metric"><strong id="vault-stat-folders">0</strong><span>Contenedores disponibles</span></div>
+              </div>
+            </div>
+            <div class="vault-hero-actions">
+              <button class="primary-button vault-cta-primary" id="vault-new-item-btn" type="button">
+                + Nuevo elemento
+              </button>
+              <input type="file" id="vault-quick-file-input" multiple accept="*/*" hidden>
+              <button class="secondary-button" id="vault-quick-upload-btn" type="button">
+                Subir fotos, vídeos o archivos
+              </button>
+              <button class="secondary-button" id="vault-record-audio-btn" type="button">
+                🎙️ Grabar nota de voz
+              </button>
+              <button class="secondary-button" id="vault-open-containers-btn" type="button">
+                🗂️ Gestionar Contenedores
+              </button>
+              <div class="vault-hero-subactions">
+                <button class="secondary-button" id="vault-export-btn" type="button">Exportar custodia</button>
+                <button class="danger-button" id="vault-lock-btn" type="button">🔒 Bloquear ahora</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="vault-category-bar" id="vault-category-tabs" role="group" aria-label="Categorías de Custodia Privada">
+            <button type="button" class="vault-cat-tab is-active" data-vault-kind="all"><span>✨ Todo</span><b id="vcount-all">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="photo"><span>📸 Fotos</span><b id="vcount-photo">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="video"><span>🎬 Vídeos</span><b id="vcount-video">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="audio"><span>🎙️ Audios</span><b id="vcount-audio">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="password"><span>🔑 Contraseñas</span><b id="vcount-password">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="bookmark"><span>🌐 Webs</span><b id="vcount-bookmark">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="chat"><span>💬 Chats</span><b id="vcount-chat">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="note"><span>📝 Apuntes y Datos</span><b id="vcount-note">0</b></button>
+            <button type="button" class="vault-cat-tab" data-vault-kind="file"><span>📦 Archivos</span><b id="vcount-file">0</b></button>
+          </div>
+
+          <div class="vault-toolbar">
+            <label class="search-box vault-search-box">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <span class="sr-only">Buscar en tu Custodia Privada</span>
+              <input id="vault-search" type="search" placeholder="Buscar por título, fecha, etiqueta, web, usuario o contenido…">
+            </label>
+            <label class="memory-filter">
+              <span class="sr-only">Colección o carpeta</span>
+              <select id="vault-folder-filter">
+                <option value="all">📁 Todas las carpetas</option>
+              </select>
+            </label>
+            <label class="memory-filter">
+              <span class="sr-only">Ordenar por</span>
+              <select id="vault-sort">
+                <option value="date_desc">🕒 Más recientes primero</option>
+                <option value="date_asc">🕰️ Más antiguos primero</option>
+                <option value="pinned">📌 Destacados primero</option>
+                <option value="title_asc">🔤 Nombre (A–Z)</option>
+                <option value="size_desc">📊 Mayor tamaño</option>
+              </select>
+            </label>
+            <button type="button" class="secondary-button vault-filter-chip" id="vault-pinned-toggle" aria-pressed="false">
+              📌 Solo destacados
+            </button>
+            <button type="button" class="secondary-button vault-filter-chip" id="vault-layout-toggle" title="Cambiar entre vista cuadrícula y lista">
+              ⊞ Vista
+            </button>
+          </div>
+
+          <div class="vault-dropzone" id="vault-dropzone">
+            <div class="vault-items-grid" id="vault-items-grid" aria-live="polite"></div>
+            <div class="empty-state vault-empty" id="vault-empty" hidden>
+              <span class="empty-icon">🔒</span>
+              <h2 id="vault-empty-title">Tu Custodia Privada está lista</h2>
+              <p id="vault-empty-copy">Guarda fotos, vídeos, grabaciones de audio, contraseñas, direcciones web, chats privados, apuntes o cualquier archivo arrastrándolos aquí o pulsando «+ Nuevo elemento».</p>
+              <div class="vault-empty-actions">
+                <button class="primary-button" type="button" id="vault-empty-new-btn">+ Añadir primer elemento</button>
+                <button class="secondary-button" type="button" id="vault-empty-upload-btn">Subir archivos desde mi equipo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view content-view system-view" id="view-system" data-page="system" hidden>
+        <div class="content-head"><div><p class="eyebrow">OPERACIÓN</p><h1>Estado del sistema</h1><p>Disponibilidad, memoria, privacidad e integración consultadas al servidor.</p></div><button class="secondary-button" id="system-refresh" type="button">Actualizar estado</button></div>
+        <p id="system-observed" class="section-status" role="status">Todavía no se ha consultado.</p>
+        <div id="system-status-grid" class="runtime-grid"></div>
+        <section class="workspace-card" aria-labelledby="system-cutover-title"><div class="section-heading"><div><h2 id="system-cutover-title">Conexiones de SHEILY</h2><p>Estado actual de las conexiones de memoria, historial y aprendizaje.</p></div></div><p id="system-cutover-verdict" class="section-status" role="status" aria-live="polite">Pendiente de consultar los servicios.</p><div id="system-integration-checks" class="check-list"></div><div class="head-actions"><button type="button" class="secondary-button" data-view="memory">Ver memoria y versiones</button><button type="button" class="secondary-button" data-view="learning">Ver fuentes, trabajos y adaptadores</button><button type="button" class="secondary-button" data-view="vault">Comprobar zona privada</button></div></section>
+        <section class="workspace-card connectome-card" aria-labelledby="connectome-title">
+          <div class="section-heading">
+            <div><h2 id="connectome-title">Conectome: arquitectura y recorrido observado</h2><p>Catálogo de sistemas declarado, flujo obligatorio y transiciones del diario nativo verificado. Solo lectura.</p></div>
+            <button class="secondary-button" id="connectome-refresh" type="button">Actualizar recorrido</button>
+          </div>
+          <p id="connectome-status" class="section-status" role="status" aria-live="polite">Pendiente de consultar el diario verificado.</p>
+          <div id="connectome-alert" class="connectome-alert" role="status" aria-live="polite" hidden></div>
+          <div class="connectome-legend" aria-label="Leyenda del diagrama">
+            <span><i class="legend-dot declared"></i>Sistema declarado</span>
+            <span><i class="legend-dot canonical"></i>Etapa obligatoria</span>
+            <span><i class="legend-dot observed"></i>Transición observada</span>
+            <span><i class="legend-dot active"></i>Etapa activa según el diario</span>
+          </div>
+          <div id="connectome-graph" class="connectome-graph" role="img" aria-label="Diagrama del conectome de SHEILY"></div>
+          <details class="connectome-paths"><summary>Ver todos los nodos y sus rutas fuente declaradas</summary><ol id="connectome-source-paths"></ol></details>
+        </section>
+      </section>
+
+      <section class="view content-view admin-view" id="view-admin" data-page="admin" hidden>
+        <div class="content-head"><div><p class="eyebrow">CONTROL AUTORIZADO</p><h1>Administración</h1><p>Inspecciona el motor y ejecuta las operaciones que el servidor autorice para tu acceso.</p></div><button class="secondary-button" id="admin-refresh" type="button">Comprobar acceso</button></div>
+        <div id="admin-access-notice" class="access-notice" role="status">Pendiente de verificar.</div>
+        <div class="head-actions"><button class="secondary-button" type="button" data-view="vault">Abrir zona privada</button><button class="secondary-button" type="button" data-view="system">Ver estado del sistema</button></div>
+        <div id="admin-workspace" hidden>
+          <div class="admin-actions-grid">
+            <section class="workspace-card"><h2>Ciclo del motor</h2><p>Solicita un ciclo operativo y muestra su recibo. No equivale a reiniciar servicios.</p><button class="primary-button" id="admin-runtime-tick" type="button" disabled>Ejecutar ciclo</button><p class="section-status" id="admin-runtime-tick-reason"></p></section>
+            <section class="workspace-card"><h2>Consolidación</h2><p>Solicita al propietario de memoria su proceso de consolidación. El resultado se comprueba en el recibo.</p><button class="primary-button" id="admin-consolidate" type="button" disabled>Solicitar consolidación</button><p class="section-status" id="admin-consolidate-reason"></p></section>
+          </div>
+          <p id="admin-action-status" class="section-status" role="status" aria-live="polite"></p>
+          <pre id="admin-action-receipt" class="technical-receipt" hidden></pre>
+          <div class="section-toolbar"><label class="settings-field"><span>Consultar</span><select id="admin-observation-kind"><option value="health">Salud del servicio</option><option value="homeostasis">Estado del motor</option><option value="memory">Estadísticas de memoria</option><option value="pending">Consolidaciones pendientes</option><option value="incidents">Incidencias GLOBUS</option></select></label><button class="secondary-button" id="admin-observation-refresh" type="button">Consultar estado</button></div>
+          <p id="admin-observation-status" class="section-status" role="status"></p><pre id="admin-observation" class="technical-receipt" hidden></pre>
+        </div>
+      </section>
+
+      <section class="view content-view" id="view-settings" data-page="settings" hidden>
+        <div class="content-head">
+          <div>
+            <p class="eyebrow">CENTRO DE CONTROL PERSONAL</p>
+            <h1>Ajustes</h1>
+            <p>Identidad, voz, apariencia y el espacio privado de este sitio.</p>
+          </div>
+          <div class="head-actions">
+            <button class="primary-button" id="save-settings-btn" type="button">Guardar ajustes</button>
+            <span class="settings-inline-feedback" id="settings-save-status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="settings-dashboard">
+          <!-- 1. Identidad y Perfil -->
+          <section class="settings-panel">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <span class="avatar large" id="settings-avatar-preview">S</span>
+                <div>
+                  <span class="panel-kicker">IDENTIDAD DEL ESPACIO</span>
+                  <h2 id="settings-owner-heading">Usuario</h2>
+                  <p id="settings-owner-subheading">Propietario y autoridad de este espacio</p>
+                </div>
+              </div>
+              <span class="status-pill positive"><i></i>Cuenta activa</span>
+            </header>
+            <div class="settings-form-grid">
+              <label class="settings-field">
+                <span>Nombre visible</span>
+                <input id="setting-display-name" type="text" maxlength="48" value="Usuario" placeholder="Tu nombre">
+              </label>
+              <label class="settings-field">
+                <span>Rol o descripción</span>
+                <input id="setting-role-label" type="text" maxlength="96" value="Propietario y autoridad de este espacio" placeholder="Propietario de este espacio personal">
+              </label>
+              <label class="settings-field">
+                <span>Correo de referencia / autoría</span>
+                <input id="setting-email-hint" type="email" maxlength="96" value="sheily.neural@gmail.com" placeholder="sheily.neural@gmail.com">
+              </label>
+              <label class="settings-field">
+                <span>Idioma principal de interfaz y respuesta</span>
+                <select id="setting-language">
+                  <option value="es" selected>Español (España / Internacional)</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <!-- 2. Espacio Privado y Contraseña Alfanumérica de 8 caracteres -->
+          <section class="settings-panel settings-panel-vault">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <div class="card-icon vault-accent-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                </div>
+                <div>
+                  <span class="panel-kicker">BÓVEDA PERSONAL PROTEGIDA</span>
+                  <h2>Custodia Privada y Contraseña (8 caracteres)</h2>
+                  <p id="settings-vault-summary">Protege tus fotos, vídeos, audios, contraseñas, direcciones web, chats, apuntes y archivos con una clave alfanumérica de 8 caracteres.</p>
+                </div>
+              </div>
+              <div class="setting-actions">
+                <span class="status-pill" id="settings-vault-pill"><i></i>Comprobando</span>
+                <button class="primary-button" id="settings-open-vault-btn" type="button">Abrir Custodia Privada</button>
+              </div>
+            </header>
+
+            <div class="settings-form-grid">
+              <label class="settings-field" id="setting-current-passcode-wrap">
+                <span>Contraseña actual (8 caracteres, si ya existe)</span>
+                <input id="setting-current-passcode" type="password" maxlength="8" placeholder="Clave actual (8 caracteres)" autocomplete="off">
+              </label>
+              <label class="settings-field">
+                <span>Nueva contraseña (exactamente 8 letras y números)</span>
+                <input id="setting-new-passcode" type="password" maxlength="8" placeholder="Ej: Sheily26" autocomplete="off">
+              </label>
+              <label class="settings-field">
+                <span>Auto-bloqueo por inactividad</span>
+                <select id="setting-vault-autolock">
+                  <option value="5">5 minutos</option>
+                  <option value="15" selected>15 minutos (Recomendado)</option>
+                  <option value="30">30 minutos</option>
+                  <option value="60">60 minutos</option>
+                  <option value="120">2 horas</option>
+                </select>
+              </label>
+              <div class="settings-field settings-field-action">
+                <span>Actualizar llave de la bóveda</span>
+                <button class="secondary-button" id="setting-save-passcode-btn" type="button">Guardar contraseña de 8 caracteres</button>
+              </div>
+            </div>
+            <p class="settings-inline-feedback" id="setting-passcode-feedback" role="status"></p>
+          </section>
+
+          <!-- 3. Motor Cognitivo, Respuesta y Voz -->
+          <section class="settings-panel">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <div class="card-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6a2 2 0 0 1 2 2v1a3 3 0 0 1 3 3v2a3 3 0 0 1 0 6v1a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-1a3 3 0 0 1 0-6V9a3 3 0 0 1 3-3V5a2 2 0 0 1 2-2Z"/><path d="M9 3v18M15 3v18"/></svg>
+                </div>
+                <div>
+                  <span class="panel-kicker">COGNICIÓN Y DIÁLOGO</span>
+                  <h2>Comportamiento Cognitivo y Voz</h2>
+                  <p>Ajusta cómo razona SHEILY, el estilo de sus respuestas y las funciones de voz e integración de memoria.</p>
+                </div>
+              </div>
+            </header>
+            <div class="settings-form-grid">
+              <label class="settings-field">
+                <span>Modo cognitivo predeterminado</span>
+                <select id="setting-cognitive-mode">
+                  <option value="balanced">Equilibrado, entre velocidad y profundidad</option>
+                  <option value="fast">Respuesta breve (preferencia de extensión)</option>
+                  <option value="deep">Explicación detallada (preferencia de extensión)</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                <span>Estilo de presentación de respuestas</span>
+                <select id="setting-response-style">
+                  <option value="balanced">Equilibrado y estructurado</option>
+                  <option value="concise">Conciso y directo al grano</option>
+                  <option value="technical">Técnico detallado con código y pruebas</option>
+                  <option value="executive">Ejecutivo (resúmenes y decisiones)</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="settings-form-grid" style="margin-top: 14px;">
+              <label class="settings-field">
+                <span>Idioma de la voz</span>
+                <select id="setting-voice-language">
+                  <option value="es">Español · voz femenina</option>
+                  <option value="en">English · female voice</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                <span>Estilo de voz</span>
+                <select id="setting-voice-select">
+                  <option value="automatic">Automático · estado interno real de Sheily</option>
+                </select>
+                <small id="voice-style-profile">Automático: tono, ritmo y volumen derivados del estado sellado del turno.</small>
+              </label>
+              <div class="settings-field settings-field-action">
+                <span>Prueba de entonación y modulación</span>
+                <button class="secondary-button" id="setting-test-voice-btn" type="button">🔊 Probar voz expresiva</button>
+              </div>
+            </div>
+            <div class="settings-form-grid" style="margin-top: 8px;">
+              <label class="settings-field">
+                <span>Tono base (<b id="voice-pitch-label">1.00x</b>)</span>
+                <input id="setting-voice-pitch" type="range" min="0.8" max="1.4" step="0.05" value="1.00">
+              </label>
+              <label class="settings-field">
+                <span>Velocidad (<b id="voice-speed-label">1.00x</b>)</span>
+                <input id="setting-voice-speed" type="range" min="0.8" max="1.3" step="0.05" value="1.00">
+              </label>
+            </div>
+
+            <div class="settings-toggles">
+              <label class="setting-toggle-row">
+                <div>
+                  <strong>Modulación causada por el estado interno</strong>
+                  <span>En Automático usa la proyección expresiva sellada del turno. No deduce emociones buscando palabras en la respuesta.</span>
+                </div>
+                <input type="checkbox" id="setting-voice-expressive" checked disabled aria-label="Modulación interna siempre activa en modo automático">
+              </label>
+              <label class="setting-toggle-row">
+                <div>
+                  <strong>Dictado por micrófono en el compositor</strong>
+                  <span>Habilita el botón de entrada por voz en la barra de chat y grabación en Custodia Privada.</span>
+                </div>
+                <input type="checkbox" id="setting-voice-dictation" checked>
+              </label>
+              <label class="setting-toggle-row">
+                <div>
+                  <strong>Lectura en voz alta automática (TTS)</strong>
+                  <span>Reproduce automáticamente con síntesis de voz las respuestas nuevas de SHEILY.</span>
+                </div>
+                <input type="checkbox" id="setting-voice-autoplay">
+              </label>
+              <label class="setting-toggle-row">
+                <div>
+                  <strong>Modo Manos Libres Continuo (Full Duplex)</strong>
+                  <span>Conversación fluida sin pulsar botones: escucha de forma continua, detecta pausas para enviar, habla la respuesta e interrumpe de inmediato si vuelves a hablar. Atajo: Alt + V.</span>
+                </div>
+                <input type="checkbox" id="setting-voice-handsfree">
+              </label>
+              <label class="setting-toggle-row">
+                <div>
+                  <strong>Botón rápido «Guardar en Custodia Privada» en chats</strong>
+                  <span>Muestra en cada respuesta y conversación un acceso directo para archivarla en Custodia Privada.</span>
+                </div>
+                <input type="checkbox" id="setting-private-chat-shortcut" checked>
+              </label>
+            </div>
+          </section>
+
+          <!-- 4. Apariencia e Interfaz -->
+          <section class="settings-panel">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <div class="card-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41"/></svg>
+                </div>
+                <div>
+                  <span class="panel-kicker">EXPERIENCIA VISUAL</span>
+                  <h2>Apariencia e Interfaz</h2>
+                  <p>Personaliza el tema cromático, la densidad de información y el tamaño tipográfico.</p>
+                </div>
+              </div>
+            </header>
+            <div class="settings-form-grid">
+              <label class="settings-field">
+                <span>Tema visual</span>
+                <select id="setting-theme">
+                  <option value="system">Automático según el sistema</option>
+                  <option value="light">Modo Claro (Papel orgánico)</option>
+                  <option value="dark">Modo Oscuro (Bosque profundo)</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                <span>Densidad de la interfaz</span>
+                <select id="setting-ui-density">
+                  <option value="comfortable">Cómoda (Espaciado amplio)</option>
+                  <option value="compact">Compacta (Más contenido en pantalla)</option>
+                </select>
+              </label>
+              <label class="settings-field">
+                <span>Escala tipográfica en lectura</span>
+                <select id="setting-font-scale">
+                  <option value="normal">Normal (100%)</option>
+                  <option value="large">Ampliada (110%)</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <!-- 5. Estado de Privacidad, Red y Gobernanza -->
+          <section class="settings-panel">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <div class="card-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <span class="panel-kicker">AISLAMIENTO Y AUDITORÍA</span>
+                  <h2>Privacidad de Red y Estado Técnico</h2>
+                  <p id="privacy-detail">Comprobando el aislamiento, la sesión y el almacenamiento…</p>
+                </div>
+              </div>
+              <span class="status-pill" id="privacy-status"><i></i>Comprobando</span>
+            </header>
+            <div class="settings-telemetry-grid" id="settings-telemetry-grid">
+              <div class="telemetry-box">
+                <span>Alcance de red</span>
+                <strong id="telemetry-network-scope">LOOPBACK_ONLY (Local)</strong>
+              </div>
+              <div class="telemetry-box">
+                <span>Cierre del Workspace</span>
+                <strong id="telemetry-workspace-closure">Verificando…</strong>
+              </div>
+              <div class="telemetry-box">
+                <span>Conversaciones locales</span>
+                <strong id="telemetry-conv-count">0</strong>
+              </div>
+              <div class="telemetry-box">
+                <span>Elementos en Custodia</span>
+                <strong id="telemetry-vault-count">0</strong>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. Soberanía de Datos y Sesión -->
+          <section class="settings-panel">
+            <header class="settings-panel-head">
+              <div class="setting-copy">
+                <div class="card-icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+                </div>
+                <div>
+                  <span class="panel-kicker">PORTABILIDAD Y SESIÓN</span>
+                  <h2>Tus Datos y Acceso</h2>
+                  <p>Exporta copias completas de tus conversaciones, memoria cognitiva o Custodia Privada, limpia el historial web o cierra tu sesión.</p>
+                </div>
+              </div>
+            </header>
+            <div class="settings-data-actions">
+              <button class="secondary-button" id="export-history-settings" type="button">Exportar historial de chats</button>
+              <button class="secondary-button" id="export-memory-settings" type="button">Exportar memoria cognitiva (ZIP)</button>
+              <button class="secondary-button" id="export-vault-settings" type="button">Exportar Custodia Privada</button>
+              <button class="danger-button" id="delete-history" type="button">Borrar historial del espacio</button>
+              <button class="secondary-button" id="sign-out" type="button">Cerrar sesión en este navegador</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <aside class="artifact-workspace" id="artifact-workspace" aria-label="Espacio de resultados" hidden>
+      <header class="workspace-header">
+        <div class="workspace-heading"><small>Espacio de trabajo</small><strong id="workspace-name"></strong></div>
+        <button class="icon-button" id="workspace-expand" type="button" aria-label="Ampliar visor" aria-pressed="false" title="Ampliar visor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button>
+        <button class="icon-button" id="workspace-close" type="button" aria-label="Cerrar visor" title="Cerrar visor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </header>
+      <div class="workspace-controls">
+        <label class="sr-only" for="workspace-files">Archivo del resultado</label><select id="workspace-files"></select>
+        <div class="workspace-tabs" role="group" aria-label="Vista del archivo">
+          <button type="button" data-workspace-mode="preview" aria-pressed="false">Vista previa</button>
+          <button type="button" data-workspace-mode="source" aria-pressed="false">Contenido</button>
+          <button type="button" id="workspace-download">Descargar</button>
+          <button type="button" id="workspace-bundle" hidden>ZIP completo</button>
+        </div>
+      </div>
+      <p class="workspace-note" id="workspace-note" role="status"></p>
+      <div class="workspace-stage" id="workspace-stage"></div>
+    </aside>
+  </div>
+
+  <div class="access-screen" id="access-screen" hidden>
+    <div class="access-card">
+      <div class="welcome-mark small" aria-hidden="true"><span>S</span></div>
+      <p class="eyebrow">ESPACIO PRIVADO</p>
+      <h1 id="access-title">Bienvenido a SHEILY</h1>
+      <p id="access-copy">Introduce tu contraseña personal para acceder. Se convertirá en una sesión segura y no se guardará en este navegador.</p>
+      <form id="access-form">
+        <label id="access-token-label" for="access-token">Contraseña</label>
+        <div class="password-field">
+          <input id="access-token" type="password" autocomplete="current-password" required minlength="12" maxlength="128" placeholder="Tu contraseña personal">
+          <button id="toggle-token" type="button" aria-label="Mostrar u ocultar clave">Ver</button>
+        </div>
+        <div class="password-field" id="access-confirm-wrap" hidden>
+          <input id="access-confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Repite la contraseña">
+        </div>
+        <p class="form-error" id="access-error" role="alert"></p>
+        <button class="primary-button full" id="access-submit" type="submit">Entrar en mi espacio</button>
+      </form>
+    </div>
+  </div>
+
+  <dialog class="action-dialog" id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-copy">
+    <form method="dialog">
+      <div class="dialog-icon danger" aria-hidden="true">!</div>
+      <h2 id="confirm-title">Confirmar acción</h2>
+      <p id="confirm-copy"></p>
+      <div class="dialog-actions">
+        <button class="secondary-button" value="cancel">Cancelar</button>
+        <button class="danger-button" id="confirm-action" value="confirm">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="action-dialog" id="rename-dialog" aria-labelledby="rename-dialog-title" aria-describedby="rename-dialog-copy">
+    <form id="rename-form">
+      <h2 id="rename-dialog-title">Renombrar conversación</h2>
+      <p id="rename-dialog-copy">Elige un título claro para encontrarla más rápido.</p>
+      <label for="rename-title">Título</label>
+      <input id="rename-title" maxlength="72" autocomplete="off" required>
+      <p class="form-error" id="rename-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="rename-cancel" type="button">Cancelar</button>
+        <button class="primary-button" type="submit">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="action-dialog note-dialog" id="note-reader-dialog" aria-labelledby="note-reader-title">
+    <div class="section-heading"><div><p class="eyebrow">ORIGINAL VERIFICADO</p><h2 id="note-reader-title">Nota</h2></div><button class="secondary-button" id="note-reader-close" type="button">Cerrar</button></div>
+    <p id="note-reader-meta" class="section-status" role="status"></p><pre id="note-reader-text" class="note-original" tabindex="0"></pre>
+    <div class="head-actions"><button id="note-reader-edit" type="button" class="primary-button" disabled>Editar esta nota</button><button id="note-reader-versions" type="button" class="secondary-button">Ver versiones</button></div>
+    <div id="note-versions-list" class="note-versions-list"></div>
+  </dialog>
+  <dialog class="action-dialog note-dialog" id="note-editor-dialog" aria-labelledby="note-editor-heading">
+    <form id="note-editor-form">
+      <div class="section-heading"><div><p class="eyebrow">MEMORIA PERSONAL</p><h2 id="note-editor-heading">Nueva nota</h2></div></div>
+      <p id="note-editor-context" class="section-status"></p>
+      <label class="settings-field"><span>Título</span><input id="note-editor-title" type="text" required></label>
+      <label class="settings-field"><span>Contenido completo</span><textarea id="note-editor-text" rows="12" required spellcheck="true"></textarea></label>
+      <p id="note-editor-replaces" class="section-status"></p><p id="note-editor-status" class="form-error" role="alert"></p>
+      <button class="secondary-button" id="note-conflict-open-current" type="button" hidden>Consultar la versión actual sin perder el borrador</button>
+      <div class="dialog-actions"><button id="note-editor-cancel" class="secondary-button" type="button">Cancelar</button><button id="note-editor-save" class="primary-button" type="submit">Guardar nota</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="action-dialog vault-modal" id="vault-item-dialog" aria-labelledby="vault-dialog-title">
+    <form id="vault-item-form">
+      <input type="hidden" id="vault-item-id">
+      <h2 id="vault-dialog-title">Nuevo elemento de Custodia Privada</h2>
+      <p class="vault-dialog-sub">Se guardará protegido y quedará fuera de memoria y aprendizaje salvo autorización separada.</p>
+      <div class="vault-form-grid">
+        <label class="settings-field">
+          <span>Tipo de contenido</span>
+          <select id="vault-item-kind" required>
+            <option value="note">📝 Apunte / Dato privado</option>
+            <option value="password">🔑 Contraseña / Credencial</option>
+            <option value="bookmark">🌐 Dirección web / Enlace</option>
+            <option value="chat">💬 Chat / Conversación privada</option>
+            <option value="photo">📸 Foto / Imagen</option>
+            <option value="video">🎬 Vídeo</option>
+            <option value="audio">🎙️ Audio / Grabación</option>
+            <option value="file">📦 Archivo / Documento</option>
+          </select>
+        </label>
+        <label class="settings-field">
+          <span>Contenedor / Colección</span>
+          <div style="display: flex; gap: 8px;">
+            <select id="vault-item-folder" style="flex: 1;" required>
+              <option value="Archivos">📁 Archivos</option>
+            </select>
+            <button type="button" class="secondary-button" id="vault-item-manage-containers-shortcut" title="Gestionar Contenedores y Reglas" style="padding: 0 10px; font-size: 14px;">🗂️</button>
+          </div>
+        </label>
+      </div>
+      <label class="settings-field">
+        <span>Título identificativo</span>
+        <input id="vault-item-title" type="text" maxlength="140" required placeholder="Ej: Documento personal, recuperación, nota confidencial…">
+      </label>
+
+      <div class="vault-form-grid">
+        <label class="settings-field"><span>Clasificación de sensibilidad</span><select id="vault-item-sensitivity" required>
+          <option value="confidencial" selected>Confidencial · Custodia normal</option>
+          <option value="personal">Personal · Datos privados</option>
+          <option value="secreto">Secreto · No mostrar sin autorización</option>
+          <option value="aislado">Aislado · Nunca usar con SHEILY</option>
+        </select></label>
+        <label class="settings-field"><span>Uso cognitivo</span><select id="vault-item-memory-policy" required>
+          <option value="no_memoria_no_aprendizaje" selected>No usar en memoria ni aprendizaje</option>
+          <option value="uso_temporal">Solo uso temporal autorizado</option>
+          <option value="memorizar_con_permiso">Memorizar solo con permiso adicional</option>
+        </select></label>
+      </div>
+
+      <div class="vault-form-grid" id="vault-credentials-fields" hidden>
+        <label class="settings-field">
+          <span>Usuario / Correo / Identificador</span>
+          <input id="vault-item-username" type="text" maxlength="140" placeholder="usuario@dominio.com" autocomplete="off">
+        </label>
+        <label class="settings-field">
+          <span>Contraseña / Clave secreta / Token</span>
+          <input id="vault-item-secret" type="password" maxlength="512" placeholder="Clave o secreto privado" autocomplete="off">
+        </label>
+      </div>
+
+      <label class="settings-field" id="vault-url-field" hidden>
+        <span>Dirección Web (URL)</span>
+        <input id="vault-item-url" type="url" maxlength="1024" placeholder="https://ejemplo.com/recurso-privado">
+      </label>
+
+      <div class="settings-field" id="vault-file-field" hidden>
+        <span>Seleccionar archivo (Cualquier extensión o formato hasta 48 MB)</span>
+        <input id="vault-item-file" type="file" accept="*/*">
+        <small id="vault-file-picked-label"></small>
+      </div>
+
+      <label class="settings-field">
+        <span>Contenido, notas, apuntes o datos privados</span>
+        <textarea id="vault-item-text" rows="5" placeholder="Escribe aquí apuntes privados, datos confidenciales, fragmentos de chat o descripción…"></textarea>
+      </label>
+
+      <div class="vault-form-grid">
+        <label class="settings-field">
+          <span>Etiquetas (separadas por coma)</span>
+          <input id="vault-item-tags" type="text" placeholder="privado, importante, 2026">
+        </label>
+        <label class="setting-toggle-row compact-toggle">
+          <div><strong>📌 Fijar como destacado</strong><span>Aparecerá arriba del todo</span></div>
+          <input type="checkbox" id="vault-item-pinned">
+        </label>
+      </div>
+
+      <p class="form-error" id="vault-item-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="vault-item-cancel" type="button">Cancelar</button>
+        <button class="primary-button" id="vault-item-submit" type="submit">Guardar en Custodia</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="action-dialog vault-modal" id="vault-containers-dialog" aria-labelledby="vault-containers-title">
+    <div class="vault-containers-manager">
+      <div class="dialog-header">
+        <h2 id="vault-containers-title">🗂️ Gestión de Contenedores de Custodia</h2>
+        <p class="vault-dialog-sub">Crea, modifica o elimina contenedores y detalla qué deben contener. SHEILY utilizará estas reglas para clasificar automáticamente tus archivos y saber qué custodiar en cada uno.</p>
+      </div>
+
+      <div class="vault-containers-layout">
+        <!-- Formulario para crear / editar contenedor -->
+        <form id="vault-container-form" class="vault-container-form">
+          <input type="hidden" id="vcontainer-id">
+          <h3 id="vcontainer-form-title">Nuevo Contenedor</h3>
+
+          <div class="vault-form-grid">
+            <label class="settings-field">
+              <span>Nombre del contenedor</span>
+              <input type="text" id="vcontainer-name" maxlength="64" required placeholder="Ej: Diagramas, Facturas, Auditorías">
+            </label>
+            <label class="settings-field" style="max-width: 90px;">
+              <span>Icono</span>
+              <input type="text" id="vcontainer-icon" maxlength="8" placeholder="📁" value="📁">
+            </label>
+          </div>
+
+          <label class="settings-field">
+            <span>Extensiones asociadas (separadas por coma)</span>
+            <input type="text" id="vcontainer-extensions" placeholder="Ej: drawio, mermaid, excalidraw, svg, puml">
+            <small style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Los archivos con estas extensiones se guardarán automáticamente en este contenedor.</small>
+          </label>
+
+          <label class="settings-field">
+            <span>Detalle de qué debe contener (Instrucción para SHEILY)</span>
+            <textarea id="vcontainer-description" rows="3" placeholder="Detalla qué tipos de archivos, datos o diagramas deben guardarse aquí. SHEILY consultará esta descripción para razonar dónde ubicar y clasificar cada archivo…"></textarea>
+            <small style="font-size: 11px; opacity: 0.8; margin-top: 3px;">Esta especificación semántica se proyecta en el contexto cognitivo de SHEILY.</small>
+          </label>
+
+          <p class="form-error" id="vcontainer-error" role="alert"></p>
+
+          <div class="dialog-actions" style="margin-top: 12px;">
+            <button type="button" class="secondary-button" id="vcontainer-cancel-btn">Limpiar / Nuevo</button>
+            <button type="submit" class="primary-button" id="vcontainer-submit-btn">Guardar Contenedor</button>
+          </div>
+        </form>
+
+        <!-- Lista de contenedores existentes -->
+        <div class="vault-containers-list-wrap">
+          <h3 style="font-size: 15px; margin-bottom: 8px;">Contenedores Activos</h3>
+          <div id="vault-containers-list" class="vault-containers-list" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+      </div>
+
+      <div class="dialog-actions" style="margin-top: 16px; border-top: 1px solid var(--control-border, rgba(255,255,255,0.1)); padding-top: 12px;">
+        <button type="button" class="secondary-button" id="vault-containers-close-btn">Cerrar Panel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Modal de Vista Previa Universal de Archivos -->
+  <dialog class="action-dialog vault-modal vault-preview-modal" id="vault-preview-dialog" aria-labelledby="vault-preview-title">
+    <div class="vault-preview-container">
+      <div class="vault-preview-header">
+        <div class="vault-preview-title-group">
+          <span id="vault-preview-icon" class="vault-preview-icon">📄</span>
+          <div class="vault-preview-title-meta">
+            <h2 id="vault-preview-title" class="vault-preview-title">Vista previa de archivo</h2>
+            <div id="vault-preview-meta" class="vault-preview-meta"></div>
+          </div>
+        </div>
+        <div class="vault-preview-actions">
+          <button type="button" class="action-btn" id="vault-preview-copy-btn" title="Copiar contenido o texto">Copiar</button>
+          <button type="button" class="action-btn" id="vault-preview-chat-btn" title="Cargar este archivo en el chat con SHEILY">Al chat</button>
+          <a id="vault-preview-download-link" class="action-btn primary" download title="Descargar archivo original">Descargar</a>
+          <button type="button" class="action-btn close-btn" id="vault-preview-close-btn" aria-label="Cerrar vista previa">Cerrar</button>
+        </div>
+      </div>
+      <div id="vault-preview-toolbar" class="vault-preview-toolbar" hidden></div>
+      <div id="vault-preview-body" class="vault-preview-body"></div>
+      <div class="vault-preview-footer">
+        <span id="vault-preview-hash" class="vault-preview-hash"></span>
+        <span id="vault-preview-status" class="vault-preview-status"></span>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
