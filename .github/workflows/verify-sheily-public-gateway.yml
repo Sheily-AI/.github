@@ -38,10 +38,10 @@ jobs:
           printf '%s\n' "$header" | grep -iq '^access-control-allow-origin: https://sheily-ai.github.io'
           printf '%s\n' "$header" | grep -iq '^access-control-expose-headers: .*x-sheily-bridge-session'
           page="$(curl --retry 2 --retry-delay 2 --max-time 20 -sSf https://sheily-ai.github.io/.github/)"
-          printf '%s' "$page" | grep -Fq 'src="./assets/pages-live-transport.js"'
+          [[ "$page" == *'src="./assets/pages-live-transport.js"'* ]]
           script="$(curl --retry 2 --retry-delay 2 --max-time 20 -sSf https://sheily-ai.github.io/.github/assets/pages-live-transport.js)"
-          printf '%s' "$script" | grep -Fq "let bridgeSession = '';"
-          if printf '%s' "$script" | grep -Fq "let ownerPassword = '';"; then
+          [[ "$script" == *"let bridgeSession = '';"* ]]
+          if [[ "$script" == *"let ownerPassword = '';"* ]]; then
             echo 'password_relay_detected'; exit 1
           fi
           echo 'GITHUB_PAGES_REAL_CDN=LIVE_BRIDGE_LOADED'
