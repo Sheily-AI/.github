@@ -45,4 +45,7 @@ jobs:
             echo 'password_relay_detected'; exit 1
           fi
           echo 'GITHUB_PAGES_REAL_CDN=LIVE_BRIDGE_LOADED'
+          owner_configured="$(curl --max-time 15 -sSf -H "Origin: $origin" "$server/api/auth/status" | python3 -c 'import json,sys; print(str(json.load(sys.stdin).get("configured",False)).lower())')"
+          echo "console_owner_login_configured=$owner_configured"
+          test "$owner_configured" = true
           echo 'PUBLIC_HTTPS_GATEWAY_PROBE=PASS'
