@@ -8,7 +8,7 @@
   let ownerPassword = '';
   const PUBLIC_PATH = /^\/(?:api\/|health(?:\/|$)|ready(?:\/|$))/;
   const PRIVATE_PATH = /^\/api\/(?:admin(?:\/|$)|vault(?:\/|$)|tidex(?:\/|$)|auth\/setup(?:\/|$)|workspace(?:\/|$))/;
-  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/|$)|control\/turns(?:\/|$)|attachments(?:\/|$)|memories(?:\/|$)|settings(?:\/|$)|privacy(?:\/|$)|inference\/session-selection(?:\/|$)|lifelong-memory(?:\/|$)|overview(?:\/|$)|meta(?:\/|$)|artifacts\/download(?:\/|$)|previews(?:\/|$)|connectome\/observed(?:\/|$)|tts\/speak(?:\/|$))$/;
+  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/.*)?|control\/turns(?:\/.*)?|attachments(?:\/.*)?|memories(?:\/.*)?|settings|privacy|inference\/session-selection(?:\/.*)?|lifelong-memory(?:\/.*)?|overview|meta|artifacts\/download|previews(?:\/.*)?|connectome\/observed|tts\/speak)$/;
   function sourceUrl(input) {
     const raw = typeof input === 'string' ? input : input && typeof input.href === 'string' ? input.href : input && input.url;
     return new URL(raw, root.location.href);
