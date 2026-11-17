@@ -19,7 +19,7 @@ on:
 jobs:
   register:
     name: Verify release archive and register GitHub artifact metadata
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, sheily-ai, yo-venus]
     timeout-minutes: 12
     permissions:
       contents: read

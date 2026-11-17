@@ -17,7 +17,9 @@ concurrency:
 jobs:
   add-to-project:
     if: github.event_name != 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    # Public repository control-plane workflow: use an isolated standard
+    # GitHub-hosted runner. Standard hosted runners are free for public repos.
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Add item to Sheily-AI project
