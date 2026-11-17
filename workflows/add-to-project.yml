@@ -8,8 +8,8 @@ on:
 
 jobs:
   add-to-project:
-    name: Add to Panel de Sheily-AI
-    runs-on: ubuntu-latest
+    name: Add to Sheily-AI organization project
+    runs-on: [self-hosted, Linux, X64, sheily-ai, yo-venus]
     steps:
       - uses: actions/add-to-project@v1.0.2
         with:
