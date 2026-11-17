@@ -3417,3 +3417,7 @@ button:not(:disabled), summary { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .connectome-edge.is-flowing, .connectome-node.is-active rect { animation: none; }
 }
+
+/* Explain failed status probes without surfacing private server data. */
+.check-row-name { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.check-row-diagnostic { display: block; font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
