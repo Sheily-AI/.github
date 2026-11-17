@@ -12,7 +12,9 @@ function build() {
     fetch: async (url, options = {}) => {
       calls.push({url, options});
       const status = String(url).endsWith('/api/auth/session') ? 204 : 200;
-      return {status, ok: true, headers: new Headers(), body: null};
+      const headers = new Headers();
+      if (String(url).endsWith('/api/auth/session') && String(options.method).toUpperCase() === 'POST') headers.set('X-Sheily-Bridge-Session', 'x'.repeat(43));
+      return {status, ok: true, headers, body: null};
     }
   };
   sandbox.globalThis = sandbox;
@@ -25,25 +27,30 @@ test('no initial password; requests route to pinned HTTPS only', async () => {
   await sandbox.fetch('/api/conversations');
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/conversations');
-  assert.equal(calls[0].options.headers.has('x-console-token'), false);
+  assert.equal(calls[0].options.headers.has('x-sheily-bridge-session'), false);
   assert.equal(calls[0].options.credentials, 'omit');
   assert.equal(calls[0].options.redirect, 'error');
 });
 
-test('owner token is validated by real session endpoint and remains in memory only', async () => {
+test('owner password is used once then only an opaque server ticket is sent', async () => {
   const {calls, sandbox} = build();
   const password = 'PrivatePass2026Secure';
   await sandbox.fetch('/api/auth/session', {method:'POST', headers:{'Content-Type':'application/json'},body:JSON.stringify({token:password})});
   assert.equal(sandbox.SheilyPagesTransport.isAuthenticated(), true);
   await sandbox.fetch('/api/conversations/abc');
-  assert.equal(calls[1].options.headers.get('x-console-token'), password);
+  assert.equal(calls[1].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
+  assert.equal(calls[1].options.headers.has('x-console-token'), false);
+  assert.equal(calls[0].options.body, JSON.stringify({token:password}));
+  assert.equal(calls[1].options.body, undefined);
   assert.equal(calls[1].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/conversations/abc');
   assert.equal(calls[1].options.headers.has('authorization'), false);
   assert.equal(Object.hasOwn(sandbox.SheilyPagesTransport,'ownerPassword'), false);
+  assert.equal(JSON.stringify(calls[1].options).includes(password), false);
   await sandbox.fetch('/api/auth/session', {method:'DELETE'});
+  assert.equal(calls[2].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
   assert.equal(sandbox.SheilyPagesTransport.isAuthenticated(), false);
   await sandbox.fetch('/api/chat', {method:'POST',body:'{}'});
-  assert.equal(calls.at(-1).options.headers.has('x-console-token'), false);
+  assert.equal(calls.at(-1).options.headers.has('x-sheily-bridge-session'), false);
 });
 
 test('private administration, vault, arbitrary endpoints and setup are blocked', async () => {
@@ -66,7 +73,23 @@ test('SSE uses authenticated fetch, not URL credentials', async () => {
   const source = new sandbox.EventSource('/api/control/turns/abc/events');
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(calls[0].url,'https://yo-venus-series.tail2ed060.ts.net:8443/api/control/turns/abc/events');
-  assert.equal(calls[0].options.headers.has('x-console-token'),false);
+  assert.equal(calls[0].options.headers.has('x-sheily-bridge-session'),false);
   source.close();
   assert.equal(source.readyState,2);
+});
+
+test('a login response without a valid opaque ticket fails closed', async () => {
+  const {sandbox} = build();
+  // Replace transport at boot to simulate an upstream that accepted login but issued no scoped ticket.
+  const source = fs.readFileSync('assets/pages-live-transport.js', 'utf8');
+  const broken = {
+    location: sandbox.location, Headers, AbortController, TextDecoder, URL, Promise, console,
+    fetch: async () => ({ status:204, ok:true, headers:new Headers(), body:null }),
+  };
+  broken.globalThis=broken;
+  vm.runInNewContext(source, broken);
+  await assert.rejects(broken.fetch('/api/auth/session', {
+    method:'POST', body:JSON.stringify({token:'SomeSecurePassword2026'})
+  }), /pasarela no entregó una sesión válida/);
+  assert.equal(broken.SheilyPagesTransport.isAuthenticated(),false);
 });
