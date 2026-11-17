@@ -1,12 +1,10 @@
 # Sheily-AI
 
-## Panel para miembros
-
-[**Abrir panel interno: actividad, estadísticas, seguridad y documentación**](https://github.com/Sheily-AI/.github-private) · [Proyecto de organización](https://github.com/orgs/Sheily-AI/projects/1)
-
-El panel interno requiere iniciar sesión con una cuenta con acceso. Las estadísticas y ejecuciones se consultan en las vistas de GitHub de cada repositorio.
-
 **Inteligencia local · continuidad · evidencia · adaptación gobernada**
+
+Guía Markdown de los proyectos de la organización. No es un panel de estadísticas ni una certificación de producción. El estado real de cada sistema debe comprobarse en su repositorio, CI y evidencias del entorno desplegado.
+
+[Repositorios de la organización](https://github.com/orgs/Sheily-AI/repositories) · [Proyecto de organización](https://github.com/orgs/Sheily-AI/projects/1) · [Documentación técnica](https://github.com/Sheily-AI/.github/wiki)
 
 Sheily-AI reúne tres proyectos de inteligencia artificial con responsabilidades distintas: **SHEILY-COGNITIVA** organiza la interacción y las capacidades, **KV-SHEI** desarrolla inferencia y memoria K/V, e **INICIO** estudia y gobierna la adaptación. Dos repositorios adicionales mantienen dependencias concretas de KV-SHEI. Esta portada es un mapa para entender el conjunto; cada sistema conserva su propia autoridad y su propio estado operativo.
 
@@ -14,21 +12,21 @@ Sheily-AI reúne tres proyectos de inteligencia artificial con responsabilidades
 
 [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) · [KV-SHEI / M-SLIM](https://github.com/Sheily-AI/KV-SHEI) · [INICIO](https://github.com/Sheily-AI/INICIO)
 
-<!-- SHEILY_ORG_PROJECTS_START -->
-## Estado automático de los proyectos
+## Componentes y herramientas
 
-Esta tabla se genera desde los metadatos de GitHub. Indica actividad del repositorio; no certifica que una versión esté desplegada o funcionando.
+Además de los proyectos principales, la organización mantiene repositorios independientes con responsabilidades delimitadas:
 
-| Proyecto | Descripción publicada | Rama | Acceso | Último cambio en GitHub |
-| --- | --- | --- | --- | --- |
-| [SHEILY-COGNITIVA](https://github.com/Sheily-AI/SHEILY-COGNITIVA) | Producto cognitivo gobernado de SHEILY: núcleo Rust, capacidades, inferencia, memoria y evidencia; los sistemas externos viven en repositorios independientes. | `main` | privado | 2026-11-09 17:49 UTC |
-| [KV-SHEI / M-SLIM](https://github.com/Sheily-AI/KV-SHEI) | M-SLIM: runtime local en Rust para ejecutar modelos de lenguaje, gestionar la caché K/V y conservar sesiones con identidad verificable, validación y recibos de ejecución. | `main` | privado | 2026-11-09 17:48 UTC |
-| [INICIO](https://github.com/Sheily-AI/INICIO) | Runtime adaptativo gobernado en Python: observa dinámicas, evalúa propuestas de aprendizaje y controla cambios estructurales con evidencia, persistencia y trazabilidad. | `main` | privado | 2026-11-09 17:21 UTC |
-| [KV-SHEI-tch-rs](https://github.com/Sheily-AI/KV-SHEI-tch-rs) | Fork de seguridad mantenido para el backend LibTorch de KV-SHEI/M-SLIM: tch 0.18.1 compatible con PyTorch/LibTorch 2.5.1 y migración de zip vulnerable a 9.0.5. | `security/zip-9.0.5-tch-0.18.1` | privado | 2026-11-07 11:24 UTC |
-| [KV-SHEI-tokenizador-rust](https://github.com/Sheily-AI/KV-SHEI-tokenizador-rust) | Fork de mantenimiento para KV-SHEI/M-SLIM: conserva tokenizers 0.22.2 y sustituye la dependencia sin mantenimiento paste por pastey mediante un commit inmutable. | `security/replace-paste-0.22.2` | privado | 2026-11-09 17:43 UTC |
+| Repositorio | Función |
+| --- | --- |
+| [GLOBUS](https://github.com/Sheily-AI/GLOBUS) | Adquisición y conciliación de evidencia externa. |
+| [TIDEX](https://github.com/Sheily-AI/TIDEX) | Evaluación y promoción gobernada de aprendizaje y evolución. |
+| [PROJECT-AUDITOR](https://github.com/Sheily-AI/PROJECT-AUDITOR) | Auditoría de conformidad, repositorios y runtime. |
+| [SHEILY-ANDROID](https://github.com/Sheily-AI/SHEILY-ANDROID) | Cliente Android independiente. |
+| [SHEILY-DEPLOYMENT-ORCHESTRATOR](https://github.com/Sheily-AI/SHEILY-DEPLOYMENT-ORCHESTRATOR) | Identidad de releases y verificación del despliegue. |
+| [SHEILY-INICIO-CONNECTOR](https://github.com/Sheily-AI/SHEILY-INICIO-CONNECTOR) | Frontera operativa de SHEILY e INICIO. |
+| [SHEILY-LIFELONG-MEMORY](https://github.com/Sheily-AI/SHEILY-LIFELONG-MEMORY) | Consolidación privada de memoria y candidatos de entrenamiento. |
 
-**Fuente observada:** GitHub · **cambio más reciente:** 2026-11-09 17:49 UTC
-<!-- SHEILY_ORG_PROJECTS_END -->
+Los repositorios privados requieren permisos. No se muestran contadores, alarmas ni fechas de ejecución que puedan quedar desactualizados. Para el estado actual, utiliza las pestañas **Actions**, **Issues** y **Pull requests** del repositorio pertinente.
 
 <details>
 <summary>Proyectos y documentación técnica</summary>
