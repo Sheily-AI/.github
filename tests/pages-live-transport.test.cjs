@@ -93,3 +93,29 @@ test('a login response without a valid opaque ticket fails closed', async () => 
   }), /pasarela no entregó una sesión válida/);
   assert.equal(broken.SheilyPagesTransport.isAuthenticated(),false);
 });
+
+test('real console health and readiness require owner session and use protected aliases', async () => {
+  const {calls, sandbox} = build();
+  await sandbox.fetch('/health');
+  await sandbox.fetch('/ready');
+  assert.equal(calls[0].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/bridge/health');
+  assert.equal(calls[1].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/bridge/ready');
+  assert.equal(calls[0].options.headers.has('x-sheily-bridge-session'), false);
+  assert.equal(calls[1].options.headers.has('x-sheily-bridge-session'), false);
+
+  await sandbox.fetch('/api/auth/session', {method:'POST', body: JSON.stringify({token:'SomeSecurePassword2026'})});
+  await sandbox.fetch('/health');
+  await sandbox.fetch('/ready');
+  assert.equal(calls[3].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
+  assert.equal(calls[4].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
+  assert.equal(calls[3].options.credentials, 'omit');
+  assert.equal(calls[4].options.credentials, 'omit');
+});
+
+test('public system panel distinguishes intentionally restricted TIDEX and keeps readiness evidence-gated', () => {
+  const site = fs.readFileSync('assets/site.js', 'utf8');
+  assert.match(site, /publicPagesBridge[\s\S]*'restricted'/);
+  assert.match(site, /Restringido en web pública/);
+  assert.match(site, /readiness\.value\.body\.ready === true/);
+  assert.match(site, /health\.value\.body\.status === 'alive'/);
+});
