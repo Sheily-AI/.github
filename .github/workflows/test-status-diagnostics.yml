@@ -1,0 +1,19 @@
+name: Verify SHEILY Pages status diagnostics
+on:
+  push:
+    branches: [feat/sheily-status-details-20261117]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: node --check assets/site.js
+      - run: node --check assets/pages-live-transport.js
+      - run: node --test tests/pages-status-diagnostics.test.cjs
+      - run: node --test tests/pages-live-transport.test.cjs
