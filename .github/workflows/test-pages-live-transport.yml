@@ -1,0 +1,19 @@
+name: Verify SHEILY Pages live transport
+on:
+  push:
+    branches: [feat/sheily-pages-live-bridge-20261117]
+    paths:
+      - assets/pages-live-transport.js
+      - tests/pages-live-transport.test.cjs
+      - .github/workflows/test-pages-live-transport.yml
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: node --check assets/pages-live-transport.js
+      - run: node --test tests/pages-live-transport.test.cjs
