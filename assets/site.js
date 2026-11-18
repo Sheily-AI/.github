@@ -3601,6 +3601,18 @@ function connectomeAssessmentLabel(state) {
   return labels[state] || String(state || 'Estado desconocido');
 }
 
+function connectomeTurnTiming(snapshot, now = Date.now()) {
+  const turn = snapshot?.latest_turn || {};
+  const status = String(turn.terminal_status || '').toUpperCase();
+  const end = Date.parse(String(turn.ended_at || ''));
+  const start = Date.parse(String(turn.started_at || ''));
+  const observedAt = Number.isFinite(end) ? end : start;
+  const ageMs = Number.isFinite(observedAt) ? Math.max(0, now - observedAt) : null;
+  const recent = ageMs !== null && ageMs <= 60000 && observedAt <= now + 5000;
+  return { ageMs, observedAt, recent, running: recent && status === 'RUNNING',
+    historical: status !== 'RUNNING' || !recent };
+}
+
 function renderObservedConnectome(snapshot) {
   const graph = $('connectome-graph');
   if (!graph || typeof document.createElementNS !== 'function') return;
@@ -3609,6 +3621,7 @@ function renderObservedConnectome(snapshot) {
     ? snapshot.nodes.filter((node) => node && node.declared === true && typeof node.node_id === 'string')
     : [];
   const nodeIds = new Set(nodes.map((node) => node.node_id));
+  const timing = connectomeTurnTiming(snapshot);
   const governing = snapshot?.governing_connectome;
   const canonicalEdges = Array.isArray(governing?.edges)
     ? governing.edges.filter((edge) => edge?.enforced === true && nodeIds.has(edge.source) && nodeIds.has(edge.target))
@@ -3657,8 +3670,8 @@ function renderObservedConnectome(snapshot) {
     line.setAttribute('y1', String(source.y));
     line.setAttribute('x2', String(target.x));
     line.setAttribute('y2', String(target.y));
-    const flowing = kind === 'observed' && edge.in_latest_turn === true;
-    line.setAttribute('class', 'connectome-edge ' + kind + (flowing ? ' is-flowing' : ''));
+    const flowing = kind === 'observed' && edge.in_latest_turn === true && timing.running;
+    line.setAttribute('class', 'connectome-edge ' + kind + (flowing ? ' is-flowing' : '') + (kind === 'observed' && timing.historical ? ' is-historical' : ''));
     line.setAttribute('marker-end', 'url(#connectome-arrow)');
     line.setAttribute('aria-label', edge.source + ' → ' + edge.target);
     const title = document.createElementNS(svgNs, 'title');
@@ -3680,11 +3693,11 @@ function renderObservedConnectome(snapshot) {
     const state = node.latest_turn_state || {};
     const phaseStatus = String(state.status || '').toUpperCase();
     const current = node.latest_turn_observed === true;
-    const active = terminal === 'RUNNING' && current && activeStatuses.has(phaseStatus);
+    const active = timing.running && current && activeStatuses.has(phaseStatus);
     const failed = phaseStatus === 'FAILED';
     const visited = current && completedStatuses.has(phaseStatus);
     const canonical = Number.isInteger(node.flow_stage_index);
-    group.setAttribute('class', 'connectome-node' + (canonical ? ' is-canonical' : '') + (active ? ' is-active' : '') + (failed ? ' is-failed' : '') + (visited ? ' is-visited' : ''));
+    group.setAttribute('class', 'connectome-node' + (canonical ? ' is-canonical' : '') + (active ? ' is-active' : '') + (failed ? ' is-failed' : '') + (visited ? ' is-visited' : '') + (current && timing.historical ? ' is-historical' : ''));
     const rect = document.createElementNS(svgNs, 'rect');
     rect.setAttribute('x', String(point.x - 91));
     rect.setAttribute('y', String(point.y - 26));
@@ -3735,15 +3748,21 @@ async function loadObservedConnectome() {
     const latest = snapshot.latest_turn || {};
     const correlation = latest.correlation_id ? ' · turno ' + String(latest.correlation_id).slice(0, 12) : '';
     const terminal = latest.terminal_status ? ' · ' + String(latest.terminal_status) : '';
+    const timing = connectomeTurnTiming(snapshot);
+    const observedDate = latest.ended_at ? new Date(latest.ended_at).toLocaleString('es') : 'sin fecha';
+    const observationKind = timing.running ? 'ejecución reciente en curso' : 'HISTÓRICO, no es actividad en vivo';
     status.textContent = connectomeAssessmentLabel(assessment.state) + ' · ' +
       String(snapshot.node_count || 0) + ' nodos declarados · ' +
       String(snapshot.coverage?.flow_stages_observed || 0) + '/' +
-      String(snapshot.coverage?.flow_stages_total || 0) + ' etapas observadas · actualizado ' + timestamp + correlation + terminal;
+      String(snapshot.coverage?.flow_stages_total || 0) + ' etapas observadas · ' + observationKind + ' · consultado ' + timestamp + ' · registrado ' + observedDate + correlation + terminal;
     const unknown = Array.isArray(snapshot.drift?.unknown_observed_system_ids_latest)
       ? snapshot.drift.unknown_observed_system_ids_latest
       : [];
     const topologyError = snapshot.canonical_topology?.error;
     const warnings = [];
+    if (timing.historical && latest.available === true) warnings.push('La ruta coloreada corresponde al último turno registrado; la actualización de la página no significa que haya un turno nuevo.');
+    if (snapshot.drift?.committed_flow_contradiction_latest === true) warnings.push('CONTRADICCIÓN: el diario registra COMMITTED pero no demuestra el flujo obligatorio completo y ordenado.');
+    if (snapshot.evidence?.journal_integrity_verified !== true) warnings.push('Diario no verificado; no certificar el recorrido visual como actividad real.');
     if (topologyError) warnings.push('Catálogo inválido: ' + String(topologyError));
     if (unknown.length) warnings.push('IDs runtime sin declarar: ' + unknown.join(', '));
     if ((snapshot.drift?.out_of_order_transitions_latest || 0) > 0) {

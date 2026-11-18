@@ -3396,10 +3396,12 @@ button:not(:disabled), summary { cursor: pointer; }
 .connectome-edge.canonical { stroke: #71927c; stroke-dasharray: 7 6; opacity: .45; }
 .connectome-edge.observed { stroke: #168778; stroke-width: 3; }
 .connectome-edge.is-flowing { stroke: #21c9bd; stroke-width: 4; opacity: 1; filter: drop-shadow(0 0 5px rgba(33,201,189,.9)); animation: connectome-flow 1.15s linear infinite; stroke-dasharray: 9 7; }
+.connectome-edge.observed.is-historical { stroke: #879591; opacity: .38; filter: none; animation: none; }
 .connectome-node rect { fill: var(--surface); stroke: #91a197; stroke-width: 1.5; }
 .connectome-node text { fill: var(--ink); font: 600 11px/1.2 system-ui, sans-serif; }
 .connectome-node.is-canonical rect { stroke: #5b8a70; stroke-width: 2; }
 .connectome-node.is-visited rect { fill: rgba(77,143,103,.12); }
+.connectome-node.is-historical rect { fill: var(--surface); stroke: #8b9894; opacity: .65; animation: none; }
 .connectome-node.is-active rect { stroke: #22c9be; stroke-width: 3; filter: drop-shadow(0 0 8px rgba(34,201,190,.85)); animation: connectome-node-pulse 1.3s ease-in-out infinite; }
 .connectome-node.is-active text { fill: #087d76; }
 .connectome-node.is-failed rect { stroke: #c64c45; fill: rgba(198,76,69,.12); }
