@@ -3699,16 +3699,29 @@ function renderObservedConnectome(snapshot) {
     const canonical = Number.isInteger(node.flow_stage_index);
     group.setAttribute('class', 'connectome-node' + (canonical ? ' is-canonical' : '') + (active ? ' is-active' : '') + (failed ? ' is-failed' : '') + (visited ? ' is-visited' : '') + (current && timing.historical ? ' is-historical' : ''));
     const rect = document.createElementNS(svgNs, 'rect');
-    rect.setAttribute('x', String(point.x - 91));
-    rect.setAttribute('y', String(point.y - 26));
-    rect.setAttribute('width', '182');
-    rect.setAttribute('height', '52');
-    rect.setAttribute('rx', '12');
+    rect.setAttribute('x', String(point.x - 100));
+    rect.setAttribute('y', String(point.y - 29));
+    rect.setAttribute('width', '200');
+    rect.setAttribute('height', '58');
+    rect.setAttribute('rx', '8');
     const label = document.createElementNS(svgNs, 'text');
     label.setAttribute('x', String(point.x));
     label.setAttribute('y', String(point.y + 4));
     label.setAttribute('text-anchor', 'middle');
-    label.textContent = String(node.name || node.node_id).slice(0, 25);
+    const fullLabel = String(node.name || node.node_id);
+    const labelParts = fullLabel.match(/.{1,17}/gu) || [''];
+    const visibleParts = labelParts.slice(0, 2);
+    if (labelParts.length > 2) {
+      visibleParts[1] = visibleParts[1].slice(0, 16) + '…';
+    }
+    label.setAttribute('aria-label', fullLabel);
+    visibleParts.forEach((part, index) => {
+      const tspan = document.createElementNS(svgNs, 'tspan');
+      tspan.setAttribute('x', String(point.x));
+      tspan.setAttribute('dy', index === 0 ? (visibleParts.length === 1 ? '0' : '-7') : '16');
+      tspan.textContent = part;
+      label.append(tspan);
+    });
     const title = document.createElementNS(svgNs, 'title');
     title.textContent = node.node_id + ' · ' + String(node.path || 'ruta no declarada') + ' · ' + (current ? phaseStatus : 'sin observar en el último turno');
     group.append(rect, label, title);

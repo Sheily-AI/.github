@@ -149,6 +149,9 @@
         status.querySelector('summary').textContent = 'SHEILY · consola remota accesible';
         const paragraph = status.querySelector('p');
         if (paragraph) paragraph.textContent = 'La conexión HTTPS responde. Introduce tu contraseña en el formulario para acceder al chat real. La clave se conserva solo en memoria mientras esta pestaña esté abierta; administración y custodia privada no se exponen.';
+        setTimeout(() => {
+          status.removeAttribute('open');
+        }, 10000);
       }
     } catch { /* Keep the accurate disconnected banner. */ }
   });

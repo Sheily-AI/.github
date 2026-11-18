@@ -3385,26 +3385,43 @@ button:not(:disabled), summary { cursor: pointer; }
 .connectome-card .section-heading { align-items: flex-start; }
 .connectome-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 12px 0 8px; color: var(--muted); font-size: 11px; }
 .connectome-legend span { display: inline-flex; align-items: center; gap: 7px; }
-.legend-dot { width: 9px; height: 9px; border-radius: 50%; background: #9aa69c; }
-.legend-dot.canonical { background: #5b8a70; }
-.legend-dot.observed { background: #168778; }
-.legend-dot.active { background: #22c9be; box-shadow: 0 0 10px #22c9be; }
-.connectome-graph { width: 100%; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: radial-gradient(ellipse at 50% 45%, rgba(38,117,103,.09), transparent 65%), var(--surface-soft); }
-.connectome-graph svg { display: block; width: 100%; min-width: 760px; height: auto; }
-.connectome-arrow { fill: #76877a; }
-.connectome-edge { stroke-width: 2; opacity: .75; }
-.connectome-edge.canonical { stroke: #71927c; stroke-dasharray: 7 6; opacity: .45; }
-.connectome-edge.observed { stroke: #168778; stroke-width: 3; }
-.connectome-edge.is-flowing { stroke: #21c9bd; stroke-width: 4; opacity: 1; filter: drop-shadow(0 0 5px rgba(33,201,189,.9)); animation: connectome-flow 1.15s linear infinite; stroke-dasharray: 9 7; }
-.connectome-edge.observed.is-historical { stroke: #879591; opacity: .38; filter: none; animation: none; }
-.connectome-node rect { fill: var(--surface); stroke: #91a197; stroke-width: 1.5; }
-.connectome-node text { fill: var(--ink); font: 600 11px/1.2 system-ui, sans-serif; }
-.connectome-node.is-canonical rect { stroke: #5b8a70; stroke-width: 2; }
-.connectome-node.is-visited rect { fill: rgba(77,143,103,.12); }
-.connectome-node.is-historical rect { fill: var(--surface); stroke: #8b9894; opacity: .65; animation: none; }
-.connectome-node.is-active rect { stroke: #22c9be; stroke-width: 3; filter: drop-shadow(0 0 8px rgba(34,201,190,.85)); animation: connectome-node-pulse 1.3s ease-in-out infinite; }
-.connectome-node.is-active text { fill: #087d76; }
+.legend-dot { width: 11px; height: 11px; border-radius: 50%; background: #89958e; }
+.legend-dot.canonical { background: #879591; }
+.legend-dot.observed { background: #1164ad; }
+.legend-dot.active { background: #0d9488; box-shadow: 0 0 8px rgba(13,148,136,.45); }
+.legend-dot.forward { background: #1164ad; }
+.legend-dot.skip-forward { background: #a66700; }
+.legend-dot.backward { background: #c43d59; }
+.legend-dot.off-flow { background: #7651b4; }
+.legend-dot.failure-journal { background: #b91c1c; }
+.connectome-graph { width: 100%; overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-soft); }
+.connectome-graph svg { display: block; width: 100%; min-width: 984px; height: auto; }
+.connectome-arrow.canonical { fill: #879591; }
+.connectome-arrow.forward { fill: #1164ad; }
+.connectome-arrow.skip_forward { fill: #a66700; }
+.connectome-arrow.backward { fill: #c43d59; }
+.connectome-arrow.off_flow, .connectome-arrow.same_stage { fill: #7651b4; }
+.connectome-arrow.failure_journal { fill: #b91c1c; }
+.connectome-edge { fill: none; stroke-width: 2.5; opacity: .9; }
+.connectome-edge.canonical { stroke: #879591; stroke-width: 1.4; stroke-dasharray: 5 7; opacity: .5; }
+.connectome-edge.relation-forward { stroke: #1164ad; }
+.connectome-edge.relation-skip_forward { stroke: #a66700; stroke-dasharray: 9 4; }
+.connectome-edge.relation-backward { stroke: #c43d59; stroke-dasharray: 3 5; }
+.connectome-edge.relation-off_flow, .connectome-edge.relation-same_stage { stroke: #7651b4; stroke-dasharray: 10 4 2 4; }
+.connectome-edge.relation-failure_journal { stroke: #b91c1c; stroke-width: 3; }
+.connectome-edge.is-flowing { stroke-width: 3.5; opacity: 1; animation: connectome-flow 1.4s linear infinite; stroke-dasharray: 9 6; }
+.connectome-edge.observed.is-historical { stroke: #879591; opacity: .38; animation: none; }
+.connectome-node rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.25; transition: stroke .15s ease, filter .15s ease; }
+.connectome-node:hover rect { stroke: var(--soft-muted); filter: drop-shadow(0 2px 5px rgba(0,0,0,.06)); }
+.connectome-node text { fill: var(--ink); font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; font-weight: 500; letter-spacing: -.2px; text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; stroke: none; paint-order: normal; filter: none; text-shadow: none; pointer-events: none; user-select: none; }
+.connectome-node.is-canonical rect { stroke: var(--forest-3, #246348); stroke-width: 1.75; }
+.connectome-node.is-visited rect { fill: rgba(36,99,72,.08); }
+.connectome-node.is-historical rect { fill: var(--surface); stroke: var(--line-strong); opacity: .7; animation: none; }
+.connectome-node.is-active rect { stroke: #0d9488; stroke-width: 2.25; filter: drop-shadow(0 0 6px rgba(13,148,136,.4)); animation: connectome-node-pulse 1.3s ease-in-out infinite; }
+.connectome-node.is-active text { fill: #087d76; font-weight: 600; }
 .connectome-node.is-failed rect { stroke: #c64c45; fill: rgba(198,76,69,.12); }
+.connectome-scope { margin: 10px 0; font-size: 13px; color: var(--muted); }
+.connectome-scope label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .connectome-alert { padding: 10px 13px; margin: 10px 0; border-left: 3px solid #cf8052; border-radius: 0 8px 8px 0; background: rgba(207,128,82,.1); color: var(--ink); font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 .connectome-paths { margin-top: 14px; color: var(--muted); font-size: 12px; }
 .connectome-paths summary { cursor: pointer; }
@@ -3414,12 +3431,8 @@ button:not(:disabled), summary { cursor: pointer; }
 @media (max-width: 650px) {
   .connectome-card { padding: 16px; }
   .connectome-paths ol { columns: 1; }
-  .connectome-graph svg { min-width: 760px; }
+  .connectome-graph svg { min-width: 984px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .connectome-edge.is-flowing, .connectome-node.is-active rect { animation: none; }
 }
-
-/* Explain failed status probes without surfacing private server data. */
-.check-row-name { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.check-row-diagnostic { display: block; font-size: 11px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
