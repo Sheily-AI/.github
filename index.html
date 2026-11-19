@@ -17,11 +17,10 @@
   <script defer src="./assets/uploads.js"></script>
   <script defer src="./assets/pages-guard.js"></script>
   <script defer src="./assets/pages-live-transport.js"></script>
+  <script defer src="./assets/neural-status.js"></script>
   <script defer src="./assets/site.js"></script>
 </head>
 <body>
-  <details id="sheily-pages-status" open style="position:fixed;z-index:999999;left:16px;bottom:16px;max-width:440px;padding:8px 12px;border:1px solid rgba(169,189,177,.4);border-radius:10px;background:rgba(23,46,38,.92);backdrop-filter:blur(8px);color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.3);font:12px/1.4 system-ui,sans-serif"><summary style="cursor:pointer;font-weight:600;font-size:12px">SHEILY · interfaz pública, motor no conectado</summary><p style="margin:6px 0 0;font-size:11px;color:#d1e3d7">Esta copia sirve la interfaz real desde GitHub Pages. El servidor cognitivo, el historial y las acciones no están disponibles aquí. Por seguridad, las peticiones de autenticación se bloquean hasta disponer de una pasarela HTTPS validada. No introduzcas claves en esta vista.</p></details>
-  <script>setTimeout(() => { const el = document.getElementById('sheily-pages-status'); if (el) el.removeAttribute('open'); }, 10000);</script>
   <div class="app-shell" id="app-shell" hidden>
     <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
       <div class="brand-row">
@@ -60,7 +59,7 @@
         </button>
         <button type="button" data-view="learning">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM5 10v6c4 4 10 4 14 0v-6M21 8v8"/></svg>
-          <span>Aprendizaje</span><small class="nav-subsystem">Lifelong Memory</small>
+          <span>Aprendizaje</span><small class="nav-subsystem">Memoria · ANC</small>
         </button>
         <p class="nav-section-label">Control</p>
         <button type="button" data-view="system">
@@ -120,11 +119,15 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-5 4 10 2-5h7"/><circle cx="12" cy="12" r="9"/></svg>
           <span>Contexto</span>
         </button>
-        <button class="icon-button theme-button" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">◐</button>
+        <button class="icon-button theme-button" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg></button>
         <button class="icon-button" id="new-chat-mobile" type="button" aria-label="Nueva conversación">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </header>
+      <div id="sheily-pages-status" class="pages-notice" role="status">
+        <span class="pages-notice-dot" aria-hidden="true"></span>
+        <div class="pages-notice-copy"><strong>Vista pública · motor no conectado</strong><p>Esta copia sirve la interfaz desde GitHub Pages. El servidor cognitivo, el historial y las acciones no están disponibles aquí, y las peticiones de autenticación se bloquean hasta disponer de una pasarela HTTPS validada. No introduzcas claves.</p></div>
+      </div>
 
       <aside id="context-inspector-panel" class="context-inspector-panel" aria-label="Inspector de contexto y privacidad" hidden>
         <div class="context-inspector-heading">
