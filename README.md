@@ -1,5 +1,9 @@
 # Sheily-AI · guía de la organización
 
+<!-- current-state:start -->
+> [Estado local verificado](docs/ESTADO_VERIFICADO_ACTUAL.md) · [Inventario de documentos](docs/INVENTARIO_DOCUMENTAL_ACTUAL.md) — captura a 2026-11-19T23:44:26+01:00; no es un panel en vivo.
+<!-- current-state:end -->
+
 Esta carpeta de GitHub mantiene la [portada pública de la organización](profile/README.md) y un índice de sus componentes. No es un panel en tiempo real.
 
 ## Áreas de trabajo
