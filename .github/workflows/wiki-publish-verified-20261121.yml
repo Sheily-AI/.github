@@ -1,0 +1,60 @@
+name: Publish verified Wiki snapshot (one-shot)
+on:
+  push:
+    branches:
+      - wiki-release-verified-20261121
+    paths:
+      - .github/workflows/wiki-publish-verified-20261121.yml
+permissions:
+  contents: write
+concurrency:
+  group: wiki-release-verified-20261121
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact publication branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Publish to this repository Wiki without force
+        shell: bash
+        env:
+          GH_WIKI_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          case "$RUNNER_TEMP/" in /mnt/DATOS_1TB/IA/*) ;; *) echo "::error::runner temp outside SSD"; exit 2;; esac
+          case "$GITHUB_WORKSPACE/" in /mnt/DATOS_1TB/IA/*) ;; *) echo "::error::checkout outside SSD"; exit 2;; esac
+          test -n "$GH_WIKI_TOKEN"
+          test -f "$GITHUB_WORKSPACE/.wiki-publication/Estado-Verificado-2026-11-21.md"
+          ASKPASS="$RUNNER_TEMP/sheily-wiki-git-askpass-$$.sh"
+          cat > "$ASKPASS" <<'ASK'
+          #!/usr/bin/env bash
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token';;
+            *Password*) printf '%s\n' "$GH_WIKI_TOKEN";;
+            *) exit 1;;
+          esac
+          ASK
+          chmod 700 "$ASKPASS"
+          trap 'rm -f "$ASKPASS"' EXIT
+          export GIT_ASKPASS="$ASKPASS" GIT_TERMINAL_PROMPT=0
+          WIKI="$RUNNER_TEMP/sheily-wiki-release-$$"
+          git clone --quiet --depth=1 "https://github.com/$GITHUB_REPOSITORY.wiki.git" "$WIKI"
+          test "$(git -C "$WIKI" rev-parse HEAD)" = 1687ec3282bf66a38fc0251aa215cd25bf5c5a53 || {
+            echo "::error::wiki head changed, refusing to overwrite other work"; exit 2;
+          }
+          test ! -e "$WIKI/Estado-Verificado-2026-11-21.md" || {
+            echo "::error::wiki page exists, refusing to overwrite"; exit 2;
+          }
+          cp "$GITHUB_WORKSPACE/.wiki-publication/Estado-Verificado-2026-11-21.md" "$WIKI/Estado-Verificado-2026-11-21.md"
+          test -f "$WIKI/Home.md" && test -f "$WIKI/_Sidebar.md"
+          printf '\n---\n**Estado verificado 2026-11-21:** [Código, CI y límites](Estado-Verificado-2026-11-21).\n' >> "$WIKI/Home.md"
+          printf '\n* [Estado verificado 2026-11-21](Estado-Verificado-2026-11-21)\n' >> "$WIKI/_Sidebar.md"
+          git -C "$WIKI" add -- Home.md _Sidebar.md Estado-Verificado-2026-11-21.md
+          git -C "$WIKI" diff --cached --check
+          git -C "$WIKI" -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'docs(wiki): publish code-verified state as of 2026-11-21'
+          git -C "$WIKI" push origin HEAD:master
