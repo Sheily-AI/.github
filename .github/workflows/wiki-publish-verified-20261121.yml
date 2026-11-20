@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   publish:
-    runs-on: [self-hosted, linux, x64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Checkout exact publication branch
@@ -26,8 +26,8 @@ jobs:
           GH_WIKI_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          case "$RUNNER_TEMP/" in /mnt/DATOS_1TB/IA/*) ;; *) echo "::error::runner temp outside SSD"; exit 2;; esac
-          case "$GITHUB_WORKSPACE/" in /mnt/DATOS_1TB/IA/*) ;; *) echo "::error::checkout outside SSD"; exit 2;; esac
+          # This is an isolated GitHub-hosted Wiki publication; it does not write to the user's local Linux host.
+          test -d "$RUNNER_TEMP" && test -d "$GITHUB_WORKSPACE"
           test -n "$GH_WIKI_TOKEN"
           test -f "$GITHUB_WORKSPACE/.wiki-publication/Estado-Verificado-2026-11-21.md"
           ASKPASS="$RUNNER_TEMP/sheily-wiki-git-askpass-$$.sh"
