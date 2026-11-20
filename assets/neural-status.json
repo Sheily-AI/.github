@@ -1,0 +1,38 @@
+{
+  "schema": "sheily.pages.neural-status.v1",
+  "asOf": "2026-11-20",
+  "kind": "static-snapshot",
+  "note": "Instantánea estática publicada con esta página. No es una lectura en vivo del servidor.",
+  "anc": {
+    "name": "ANC",
+    "title": "Núcleo neuronal adaptativo",
+    "summary": "Red recurrente dispersa de neuronas LIF que aprende en línea solo de episodios reales y verificados del libro mayor (learning.episode.compiled), separados por inquilino, principal y actor.",
+    "status": {
+      "integrated": true,
+      "activated": false,
+      "certified": false,
+      "benefitDemonstrated": false
+    },
+    "statusLabel": "Integrado en el código · no activado · sin certificar",
+    "tiles": [
+      {"label": "Estado", "value": "Sin activar", "hint": "Requiere SHEI_ANC_ENABLED=1 en el trabajador"},
+      {"label": "Pruebas", "value": "59 / 59", "hint": "Pruebas unitarias del crate"},
+      {"label": "Recurrencia (laboratorio)", "value": "9 de 12 semillas", "hint": "El intervalo de confianza incluye 0"},
+      {"label": "Plasticidad (laboratorio)", "value": "5 de 8 semillas", "hint": "El intervalo de confianza incluye 0"}
+    ],
+    "pipeline": [
+      {"step": "Episodio verificado", "detail": "Solo episodios reales del libro mayor"},
+      {"step": "Codificación", "detail": "514 canales con hash (v2)"},
+      {"step": "Red LIF dispersa", "detail": "Recurrente, aprendizaje en línea"},
+      {"step": "Plasticidad", "detail": "Crédito por proceso, BCM, pesos rápidos y lentos"},
+      {"step": "Retención", "detail": "Banco funcional y repetición guardada"},
+      {"step": "Metacognición", "detail": "Brier frente a una línea base"},
+      {"step": "Punto de control", "detail": "SHA-256, no autenticado"}
+    ],
+    "caveats": [
+      "El beneficio sobre SHEILY todavía no está demostrado.",
+      "ANC está diseñado como trabajador separado del turno; no está demostrado que se encuentre activo en producción ni que participe en el último recorrido observado.",
+      "El catálogo actualizado del Conectome declara 25 sistemas e incluye shei.neural.anc y shei.neural.mesh; la declaración no demuestra activación ni ejecución."
+    ]
+  }
+}
