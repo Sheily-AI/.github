@@ -124,6 +124,11 @@ test('public system panel checks TIDEX through owner authentication and keeps re
   const site = fs.readFileSync('assets/site.js', 'utf8');
   assert.doesNotMatch(site, /Restringido en web pública/);
   assert.match(site, /tidexReachable = valueOrUnknown/);
+  assert.match(site, /function tidexStatusReachable\(body\)/);
+  assert.match(site, /body\.configured === true/);
+  assert.match(site, /body\.can_evaluate === true/);
+  assert.match(site, /body\.blockers\.length === 0/);
+  assert.doesNotMatch(site, /tidex\.lifelong_memory_status\/v1' && body\.ok === true/);
   assert.match(site, /readiness\.value\.body\.ready === true/);
   assert.match(site, /health\.value\.body\.status === 'alive'/);
 });
