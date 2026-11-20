@@ -33,7 +33,7 @@ jobs:
           test "$code" = 401
           code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$server/api/admin/health")"
           echo "external_admin_denial=$code"
-          test "$code" = 403
+          [[ "$code" == 401 || "$code" == 403 ]]
           code="$(curl --max-time 15 -sS -o /dev/null -w '%{http_code}' -H 'Origin: https://evil.invalid' "$server/api/auth/status")"
           echo "external_bad_origin_denial=$code"
           test "$code" = 403

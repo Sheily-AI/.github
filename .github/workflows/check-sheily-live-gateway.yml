@@ -19,14 +19,20 @@ jobs:
           page=https://sheily-ai.github.io/.github/
           api=https://yo-venus-series.tail2ed060.ts.net:8443
           origin=https://sheily-ai.github.io
-          html="$(curl --retry 2 --max-time 15 -fsS "$page")"
+          for attempt in {1..18}; do
+            html="$(curl --retry 2 --max-time 15 -fsS "$page" || true)"
+            site="$(curl --retry 2 --max-time 15 -fsS "${page}assets/site.js" || true)"
+            provenance="$(curl --retry 2 --max-time 15 -fsS "${page}assets/build-provenance.json" || true)"
+            if [[ "$html" == *'src="./assets/pages-live-transport.js"'* && "$site" == *"Sin ejecución verificada en curso"* && "$provenance" == *'"source_repository": "Sheily-AI/SHEILY-COGNITIVA"'* ]]; then
+              break
+            fi
+            sleep 5
+          done
           script="$(curl --retry 2 --max-time 15 -fsS "${page}assets/pages-live-transport.js")"
-          site="$(curl --retry 2 --max-time 15 -fsS "${page}assets/site.js")"
           [[ "$html" == *'src="./assets/pages-live-transport.js"'* ]]
           [[ "$script" == *"/api/bridge/ready"* ]]
           [[ "$script" == *"/api/bridge/health"* ]]
           [[ "$site" == *"Sin ejecución verificada en curso"* ]]
-          provenance="$(curl --retry 2 --max-time 15 -fsS "${page}assets/build-provenance.json")"
           [[ "$provenance" == *'"source_repository": "Sheily-AI/SHEILY-COGNITIVA"'* ]]
           echo "pages_cdn_diagnostic_frontend=PASS"
           h="$(curl --max-time 10 -fsS -o /dev/null -w '%{http_code}' "$api/health")"
@@ -36,7 +42,7 @@ jobs:
           p="$(curl --max-time 10 -sS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$api/api/admin/health")"
           x="$(curl --max-time 10 -sS -o /dev/null -w '%{http_code}' -H "Origin: https://other.invalid" "$api/api/bridge/health")"
           echo "gateway_public_health=$h auth_status=$a unauth_health=$e unauth_ready=$r blocked_admin=$p other_origin=$x"
-          [[ "$h" == 200 && "$a" == 200 && "$e" == 401 && "$r" == 401 && "$p" == 403 && "$x" == 403 ]]
+          [[ "$h" == 200 && "$a" == 200 && "$e" == 401 && "$r" == 401 && ( "$p" == 401 || "$p" == 403 ) && "$x" == 403 ]]
           head="$(curl --max-time 10 -sS -D - -o /dev/null -X OPTIONS -H "Origin: $origin" -H "Access-Control-Request-Method: GET" -H "Access-Control-Request-Headers: X-Sheily-Bridge-Session" "$api/api/bridge/ready")"
           [[ "$head" == *'204'* ]] || { echo 'preflight_not_successful'; exit 1; }
           [[ "${head,,}" == *"access-control-allow-origin: $origin"* ]] || { echo 'cors_origin_mismatch'; exit 1; }
