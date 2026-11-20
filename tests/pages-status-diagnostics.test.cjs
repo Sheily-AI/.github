@@ -43,9 +43,9 @@ test('network failure is not silently counted as verified', () => {
   assert.doesNotMatch(sandbox.hint({status:'rejected',reason:{message:'personal content'}}),/personal content/);
 });
 
-test('public TIDEX is excluded from verifiable count without being reclassified as successful', () => {
-  assert.match(source,/const checkable = entries\.length - restricted/);
-  assert.match(source,/result === 'restricted' \? 'Restringido en web pública'/);
+test('public TIDEX remains evidence-gated behind owner authentication', () => {
+  assert.match(source,/const tidexReachable = valueOrUnknown/);
+  assert.doesNotMatch(source,/Restringido en web pública/);
   assert.match(source,/result === true \? 'Comprobado'/);
   assert.match(source,/notesReachable === true \? '' : notes\.status === 'rejected'/);
   assert.match(source,/sessionScoped === true \? '' : selection\.status === 'rejected'/);

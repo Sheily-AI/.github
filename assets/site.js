@@ -3862,7 +3862,7 @@ async function loadSystemStatus() {
   grid.append(runtimeCard('Acceso y privacidad',
     publicPagesBridge ? 'Pasarela HTTPS · núcleo local' : network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar',
     publicPagesBridge
-      ? 'La consola y los datos siguen en el servidor privado. Este acceso HTTPS habilita chat y Custodia Privada con sesiones independientes; administración y TIDEX no se exponen.'
+      ? 'La consola y los datos siguen en el servidor privado. La pasarela expone las funciones de propietario mediante una lista cerrada; cada control mantiene la autorización y confirmación exigidas por el servidor.'
       : privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.',
     publicPagesBridge ? privateBody !== null : network === 'LOOPBACK_ONLY'));
   const mb = lifelongMemory.status === 'fulfilled' ? lifelongMemory.value : null;
@@ -3873,9 +3873,7 @@ async function loadSystemStatus() {
   const sessionScoped = valueOrUnknown(selection, body => body?.schema === 'shei.llm_session_selection/v1' && body.scope === 'authenticated_owner_conversation' && /^[a-f0-9]{64}$/.test(body.owner_binding || '') && /^[a-f0-9]{64}$/.test(body.session_binding || ''));
   const historyReachable = valueOrUnknown(history, body => body?.read_only === true && Array.isArray(body.turns) && /^[a-f0-9]{64}$/.test(body.history_version || ''));
   const jobsReachable = valueOrUnknown(jobs, body => body?.ok === true && Array.isArray(body.jobs));
-  const tidexReachable = publicPagesBridge
-    ? 'restricted'
-    : valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
+  const tidexReachable = valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
   const entries = [
     ['Consola y API SHEILY preparadas', ready === true ? true : readiness.status === 'fulfilled' ? false : null],
     ['Fuentes originales de Lifelong Memory íntegras', mb?.archive?.integrity?.verified ?? null],
@@ -3895,7 +3893,7 @@ async function loadSystemStatus() {
       sessionScoped === true ? '' : selection.status === 'rejected'
         ? systemObservationHint(selection) : 'La respuesta no acredita las vinculaciones de identidad y conversación.'],
     ['Servicio de evaluación y promoción TIDEX consultable',
-      publicPagesBridge ? 'Solo disponible desde la consola administrativa autorizada.' : systemObservationHint(tidex)],
+      tidexReachable === true ? '' : systemObservationHint(tidex)],
   ]);
   for (const [label, result] of entries) {
     const row = document.createElement('div'); row.className = 'check-row';
@@ -3910,18 +3908,12 @@ async function loadSystemStatus() {
     }
     const value = document.createElement('strong'); value.textContent =
       result === true ? 'Comprobado'
-      : result === false ? 'Pendiente'
-      : result === 'restricted' ? 'Restringido en web pública' : 'No verificado';
+      : result === false ? 'Pendiente' : 'No verificado';
     row.append(name, value); checks.append(row);
   }
   const checked = entries.filter(([, result]) => result === true).length;
-  const restricted = entries.filter(([, result]) => result === 'restricted').length;
-  const checkable = entries.length - restricted;
-  $('system-cutover-verdict').textContent = checked + ' de ' + checkable + ' conexiones verificables comprobadas en esta consulta.'
-    + (restricted ? ' ' + restricted + ' conexión restringida por seguridad.' : '')
-    + (publicPagesBridge
-      ? ' TIDEX y los controles privados no están disponibles desde GitHub Pages; compruébalos en la consola administrativa local.'
-      : tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
+  $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones verificables comprobadas en esta consulta.'
+    + (tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
     + ' La verificación de migración y recuperación se documenta en el informe de instalación.';
   $('system-observed').textContent = 'Última consulta: ' + new Date().toLocaleString('es') + '. Cada operación devuelve su propio resultado.';
   $('system-refresh').disabled = false;

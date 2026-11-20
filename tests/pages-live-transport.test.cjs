@@ -53,17 +53,20 @@ test('owner password is used once then only an opaque server ticket is sent', as
   assert.equal(calls.at(-1).options.headers.has('x-sheily-bridge-session'), false);
 });
 
-test('private administration and arbitrary endpoints stay blocked while vault uses the owner ticket', async () => {
+test('owner production surfaces use the scoped ticket while arbitrary endpoints stay blocked', async () => {
   const {calls, sandbox} = build();
-  for (const path of ['/api/admin/health','/api/tidex/status','/api/auth/setup','/api/workspace/closure','/api/shell']) {
+  for (const path of ['/api/auth/setup','/api/shell']) {
     await assert.rejects(sandbox.fetch(path),/no está habilitada/);
   }
   assert.equal(calls.length,0);
   await sandbox.fetch('/api/auth/session', {method:'POST', body:JSON.stringify({token:'SomeSecurePassword2026'})});
-  await sandbox.fetch('/api/vault/items');
-  assert.equal(calls[1].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/vault/items');
-  assert.equal(calls[1].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
-  assert.equal(calls[1].options.credentials, 'omit');
+  for (const path of ['/api/vault/items','/api/admin/health','/api/tidex/status','/api/workspace/closure']) {
+    await sandbox.fetch(path);
+    const call = calls.at(-1);
+    assert.equal(call.url, 'https://yo-venus-series.tail2ed060.ts.net:8443' + path);
+    assert.equal(call.options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
+    assert.equal(call.options.credentials, 'omit');
+  }
 });
 
 test('outside requests are not forwarded to SHEILY backend', async () => {
@@ -117,10 +120,10 @@ test('real console health and readiness require owner session and use protected 
   assert.equal(calls[4].options.credentials, 'omit');
 });
 
-test('public system panel distinguishes intentionally restricted TIDEX and keeps readiness evidence-gated', () => {
+test('public system panel checks TIDEX through owner authentication and keeps readiness evidence-gated', () => {
   const site = fs.readFileSync('assets/site.js', 'utf8');
-  assert.match(site, /publicPagesBridge[\s\S]*'restricted'/);
-  assert.match(site, /Restringido en web pública/);
+  assert.doesNotMatch(site, /Restringido en web pública/);
+  assert.match(site, /tidexReachable = valueOrUnknown/);
   assert.match(site, /readiness\.value\.body\.ready === true/);
   assert.match(site, /health\.value\.body\.status === 'alive'/);
 });
