@@ -1,0 +1,22 @@
+{
+  "files": {
+    "assets/memory-export.js": "2358d9ea2819ebfafe202195e4d8116dfdc8b58711cc41b4147f1baa98ddbf43",
+    "assets/pages-guard.js": "233d76f4fd7bd22d8f0f77683805052364ae3ccb51829c24e2e993d83d01cca7",
+    "assets/pages-live-transport.js": "23c40860746f43d9d202bc864dce95e1146a64e279012130039d52eedba478c1",
+    "assets/results.js": "ee7f76e9eb2b002b9fe29309254a64d18900f66aa7e17b6ae0398d1981aad6fe",
+    "assets/site.css": "85a488a1394090f50bacad391f273918a02106e77d2011742d19ecd8c3c3a6a3",
+    "assets/site.js": "20f7dec41406c60ebf7e4bc98de7f72abc93f28cbcf3856ae895e6dba33efa77",
+    "assets/uploads.js": "f6cbd0d26a20e27c991bc65e32c08b6db3827788c41516c3ef7c6ce9fb3f8191",
+    "assets/vendor/fflate.LICENSE": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551",
+    "assets/vendor/fflate.min.js": "462ef8041fc970e3615a20a9dd2b2e3047a073b2da729ef4f02b634bba8b7b83",
+    "assets/vendor/highlight.LICENSE": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490",
+    "assets/vendor/highlight.min.js": "c4a399dd6f488bc97a3546e3476747b3e714c99c57b9473154c6fb8d259b9381",
+    "assets/vendor/markdown-it.LICENSE": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473",
+    "assets/vendor/markdown-it.min.js": "635972b985228e8af9f0143647c68616b7a3bb09f6946e7e4a52e43dcf5e7be5",
+    "assets/workspace.css": "2d21cafe056ff2cda6f74794c76b1586615800670da6a5ab838ecdd9785f838d",
+    "index.html": "b6afe0a9212253059d69a65daf218a91354e1f3552cc94306eee05d4f028a2f8"
+  },
+  "schema": "sheily.pages.build-provenance/v1",
+  "source_repository": "Sheily-AI/SHEILY-COGNITIVA",
+  "source_sha": "fe65a85b21d056972f545ad45b165feb75fcbde2"
+}

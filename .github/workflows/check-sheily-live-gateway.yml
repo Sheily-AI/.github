@@ -1,7 +1,7 @@
 name: Check SHEILY public Pages and owner gateway
 on:
   push:
-    branches: [sheily-pages]
+    branches: [main]
     paths:
       - .github/workflows/check-sheily-live-gateway.yml
   workflow_dispatch:
@@ -25,7 +25,9 @@ jobs:
           [[ "$html" == *'src="./assets/pages-live-transport.js"'* ]]
           [[ "$script" == *"/api/bridge/ready"* ]]
           [[ "$script" == *"/api/bridge/health"* ]]
-          [[ "$site" == *"Restringido en web pública"* ]]
+          [[ "$site" == *"Sin ejecución verificada en curso"* ]]
+          provenance="$(curl --retry 2 --max-time 15 -fsS "${page}assets/build-provenance.json")"
+          [[ "$provenance" == *'"source_repository": "Sheily-AI/SHEILY-COGNITIVA"'* ]]
           echo "pages_cdn_diagnostic_frontend=PASS"
           h="$(curl --max-time 10 -fsS -o /dev/null -w '%{http_code}' "$api/health")"
           a="$(curl --max-time 10 -fsS -o /dev/null -w '%{http_code}' -H "Origin: $origin" "$api/api/auth/status")"

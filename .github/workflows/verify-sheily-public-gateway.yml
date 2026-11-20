@@ -1,9 +1,12 @@
 name: Verify external HTTPS SHEILY owner gateway
 on:
   push:
-    branches: [feat/sheily-pages-live-bridge-20261117]
+    branches: [main]
     paths:
+      - index.html
+      - assets/**
       - .github/workflows/verify-sheily-public-gateway.yml
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
