@@ -867,6 +867,21 @@ function contextResult(result, property) {
   return result.status === 'fulfilled' ? (property ? result.value?.[property] : result.value) : null;
 }
 
+function contextFailureReason(result) {
+  if (result?.status !== 'rejected') return '';
+  const reason = result.reason;
+  if (reason?.status === 503) return 'servicio temporalmente no disponible';
+  if (reason?.code === 'AUTH_REQUIRED') return 'sesión no autorizada';
+  if (reason?.code === 'PRIVATE_AUTH_REQUIRED') return 'espacio privado bloqueado';
+  const message = String(reason?.message || '').trim();
+  return message ? message.slice(0, 160) : 'lectura rechazada por el servidor';
+}
+
+function contextFailureSummary(results, labels) {
+  return results.flatMap((result, index) => result.status === 'rejected'
+    ? [labels[index] + ': ' + contextFailureReason(result)] : []);
+}
+
 function closeContextInspector() {
   const panel = $('context-inspector-panel');
   if (panel) panel.hidden = true;
@@ -893,6 +908,7 @@ async function refreshContextInspector() {
   const scope = { sessionId: state.sessionId, conversationId };
   $('context-inspector-status').textContent = 'Consultando ajustes, privacidad, memoria, bóveda y documentos…';
   $('context-inspector-refresh').disabled = true;
+  const sourceLabels = ['ajustes', 'privacidad', 'memoria', 'custodia', 'documentos'];
   const results = await Promise.allSettled([
     apiRequest('/api/settings'),
     apiRequest('/api/privacy?session_id=' + encodeURIComponent(state.sessionId)),
@@ -916,7 +932,8 @@ async function refreshContextInspector() {
     ['Último turno', state.lastTurn?.conversationId === conversationId
       ? state.lastTurn.status + (Number.isSafeInteger(state.lastTurn.elapsedMs)
         ? ' · ' + state.lastTurn.elapsedMs + ' ms hasta respuesta HTTP (incluye cargas)' : '')
-      : (state.lastTurnCorrelationId ? 'Registro disponible para consulta' : 'Sin turno seleccionado')],
+      : (state.lastTurnCorrelationId ? 'Registro disponible para consulta'
+        : 'Esta conversación aún no tiene un turno registrado')],
   ]));
   display.append(contextInspectorSection('Memorias y preferencias', [
     ['Recuerdos registrados', memory?.schema === 'shei.public.memory_list/v2' &&
@@ -939,9 +956,9 @@ async function refreshContextInspector() {
       ? 'El servidor declara ámbito local y espacio privado activo'
       : 'No certificada en esta lectura'],
   ]));
-  const failures = results.filter((result) => result.status !== 'fulfilled').length;
-  $('context-inspector-status').textContent = failures
-    ? 'Lectura parcial: ' + failures + ' fuentes no disponibles. No se infieren resultados faltantes.'
+  const failures = contextFailureSummary(results, sourceLabels);
+  $('context-inspector-status').textContent = failures.length
+    ? 'Lectura parcial. No disponibles: ' + failures.join(' · ') + '. No se infieren resultados faltantes.'
     : 'Cinco fuentes del servidor consultadas. No equivale a certificación de ejecución de memoria.';
   const receipt = state.lastTurnCorrelationId;
   $('context-inspector-report').disabled = !receipt ||
@@ -3601,6 +3618,8 @@ function connectomeAssessmentLabel(state) {
   return labels[state] || String(state || 'Estado desconocido');
 }
 
+// A polling timestamp is not execution evidence. Only a recent, still-running
+// turn may be presented with animated activity; committed turns are history.
 function connectomeTurnTiming(snapshot, now = Date.now()) {
   const turn = snapshot?.latest_turn || {};
   const status = String(turn.terminal_status || '').toUpperCase();
@@ -3613,6 +3632,78 @@ function connectomeTurnTiming(snapshot, now = Date.now()) {
     historical: status !== 'RUNNING' || !recent };
 }
 
+// Provenance is not functionality. A listed owner path or an instrumented
+// source anchor does not certify a running subsystem.
+function connectomeNodeEvidenceLabel(node) {
+  const owner = String(node?.path || 'RUTA NO DECLARADA');
+  const proof = node?.provenance;
+  const run = node?.verification;
+  if (!proof || !run) {
+    return String(node?.node_id || 'NODO SIN ID') + ' · fuente: ' + owner +
+      ' · auditoría individual no disponible en esta versión del backend';
+  }
+  const emitter = proof.emitter_source_anchor_present === true
+    ? String(proof.emitter_source_path || 'sin archivo')
+    : 'no acreditado';
+  const observed = run.verified_native_journal_observed === true
+    ? 'observado en diario verificado' : 'sin ejecución verificada en ventana';
+  const successes = Number(run.certified_success_receipts || 0);
+  const unit = node.individual_behavior_test;
+  const unitContract = unit && unit.status === 'DECLARED_NOT_EXECUTED_IN_DEPLOYED_RUNTIME'
+    ? ' · prueba Rust configurada: ' + String(unit.package || '') + '::' +
+      String(unit.test_name || '') + ' (NO certificada en la release desplegada)'
+    : '';
+  return String(node.node_id) + ' · propietario: ' + owner +
+    ' · implementación: ' + String(proof.implementation_source_path || 'no localizada') +
+    ' · emisor: ' + emitter + ' · ' + observed +
+    ' · recibos de éxito: ' + successes + unitContract +
+    ' · certificación funcional individual: NO ACREDITADA';
+}
+
+function connectomeViewMode() {
+  const selected = document.querySelector('input[name="connectome-mode"]:checked');
+  return ['live', 'history', 'architecture'].includes(selected?.value) ? selected.value : 'live';
+}
+
+function connectomePresentation(snapshot, requestedMode, now = Date.now()) {
+  const mode = ['live', 'history', 'architecture'].includes(requestedMode) ? requestedMode : 'live';
+  const timing = connectomeTurnTiming(snapshot, now);
+  return {
+    mode,
+    timing,
+    showGraph: mode !== 'live' || timing.running,
+    showObserved: mode === 'history' || (mode === 'live' && timing.running),
+    showArchitecture: mode === 'architecture',
+  };
+}
+
+function connectomeStatusSummary(snapshot, presentation, consultedAt) {
+  const declaredNodes = Number(snapshot?.node_count || 0);
+  const identityProof = snapshot?.canonical_topology?.exact_identity_contract_verified === true
+    ? ' · catálogo exacto ' + declaredNodes + '/' + declaredNodes
+    : ' · catálogo SIN certificación exacta';
+  if (presentation.mode === 'architecture') {
+    return 'Arquitectura declarada · ' + declaredNodes + ' nodos' + identityProof +
+      ' · no acredita ejecución · consultado ' + consultedAt;
+  }
+  if (presentation.mode === 'live' && !presentation.timing.running) {
+    return 'Sin ejecución verificada en curso · ' + declaredNodes + ' nodos declarados' +
+      identityProof + ' · consultado ' + consultedAt;
+  }
+  const assessment = snapshot?.assessment || {};
+  const latest = snapshot?.latest_turn || {};
+  const correlation = latest.correlation_id ? ' · turno ' + String(latest.correlation_id).slice(0, 12) : '';
+  const terminal = latest.terminal_status ? ' · ' + String(latest.terminal_status) : '';
+  const lastRecordedAt = latest.ended_at ? ' · registrado ' + new Date(latest.ended_at).toLocaleString('es') : '';
+  const observationKind = presentation.mode === 'history'
+    ? ' · ÚLTIMO TURNO HISTÓRICO, no es actividad actual'
+    : ' · EN VIVO, ejecución reciente en curso';
+  return connectomeAssessmentLabel(assessment.state) + ' · ' + declaredNodes + ' nodos declarados · ' +
+    String(snapshot?.coverage?.flow_stages_observed || 0) + '/' +
+    String(snapshot?.coverage?.flow_stages_total || 0) + ' etapas observadas' + identityProof +
+    observationKind + ' · consultado ' + consultedAt + correlation + terminal + lastRecordedAt;
+}
+
 function renderObservedConnectome(snapshot) {
   const graph = $('connectome-graph');
   if (!graph || typeof document.createElementNS !== 'function') return;
@@ -3621,20 +3712,35 @@ function renderObservedConnectome(snapshot) {
     ? snapshot.nodes.filter((node) => node && node.declared === true && typeof node.node_id === 'string')
     : [];
   const nodeIds = new Set(nodes.map((node) => node.node_id));
-  const timing = connectomeTurnTiming(snapshot);
+  const presentation = connectomePresentation(snapshot, connectomeViewMode());
+  const { mode, timing } = presentation;
   const governing = snapshot?.governing_connectome;
-  const showArchitecture = $('connectome-show-architecture')?.checked === true;
-  const canonicalEdges = showArchitecture && Array.isArray(governing?.edges)
+  const empty = $('connectome-empty');
+  if (!presentation.showGraph) {
+    graph.replaceChildren();
+    graph.hidden = true;
+    graph.removeAttribute('data-correlation-id');
+    if (empty) {
+      empty.textContent = 'No hay una ejecución verificada en curso. El último turno no se muestra aquí porque es histórico.';
+      empty.hidden = false;
+    }
+    const pathList = $('connectome-source-paths');
+    if (pathList) pathList.replaceChildren();
+    return;
+  }
+  graph.hidden = false;
+  if (empty) { empty.hidden = true; empty.textContent = ''; }
+  const canonicalEdges = presentation.showArchitecture && Array.isArray(governing?.edges)
     ? governing.edges.filter((edge) => edge?.enforced === true && nodeIds.has(edge.source) && nodeIds.has(edge.target))
     : [];
-  const latestOnly = $('connectome-latest-only')?.checked !== false;
-  const observedEdges = Array.isArray(snapshot?.edges)
-    ? snapshot.edges.filter((edge) => edge?.verified === true && nodeIds.has(edge.source) && nodeIds.has(edge.target) &&
-        (!latestOnly || edge.in_latest_turn === true))
+  const observedEdges = presentation.showObserved && Array.isArray(snapshot?.edges)
+    ? snapshot.edges.filter((edge) => edge?.verified === true &&
+        nodeIds.has(edge.source) && nodeIds.has(edge.target) &&
+        edge.in_latest_turn === true)
     : [];
   const columns = 4;
-  const cellWidth = 226;
-  const rowHeight = 112;
+  const cellWidth = 246;
+  const rowHeight = 118;
   const rows = Math.max(1, Math.ceil(nodes.length / columns));
   const width = columns * cellWidth;
   const height = rows * rowHeight + 28;
@@ -3650,37 +3756,53 @@ function renderObservedConnectome(snapshot) {
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', nodes.length + ' sistemas declarados; ' + canonicalEdges.length + ' conexiones obligatorias y ' + observedEdges.length + ' conexiones observadas.');
   const defs = document.createElementNS(svgNs, 'defs');
-  const marker = document.createElementNS(svgNs, 'marker');
-  marker.setAttribute('id', 'connectome-arrow');
-  marker.setAttribute('viewBox', '0 0 10 10');
-  marker.setAttribute('refX', '8');
-  marker.setAttribute('refY', '5');
-  marker.setAttribute('markerWidth', '6');
-  marker.setAttribute('markerHeight', '6');
-  marker.setAttribute('orient', 'auto-start-reverse');
-  const arrow = document.createElementNS(svgNs, 'path');
-  arrow.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
-  arrow.setAttribute('class', 'connectome-arrow');
-  marker.append(arrow);
-  defs.append(marker);
+  const relations = ['canonical', 'forward', 'skip_forward', 'backward', 'off_flow', 'failure_journal', 'same_stage'];
+  relations.forEach((relation) => {
+    const marker = document.createElementNS(svgNs, 'marker');
+    marker.setAttribute('id', 'connectome-arrow-' + relation);
+    marker.setAttribute('viewBox', '0 0 10 10');
+    marker.setAttribute('refX', '9');
+    marker.setAttribute('refY', '5');
+    marker.setAttribute('markerWidth', '5');
+    marker.setAttribute('markerHeight', '5');
+    marker.setAttribute('orient', 'auto');
+    const arrow = document.createElementNS(svgNs, 'path');
+    arrow.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+    arrow.setAttribute('class', 'connectome-arrow ' + relation);
+    marker.append(arrow);
+    defs.append(marker);
+  });
   svg.append(defs);
   const drawEdge = (edge, kind) => {
     const source = positions.get(edge.source);
     const target = positions.get(edge.target);
     if (!source || !target) return;
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const length = Math.hypot(dx, dy);
+    if (length < 1) return;
+    // Terminate at node boundaries; arrows must not obscure labels.
+    const trim = 1 / Math.max(Math.abs(dx) / 108, Math.abs(dy) / 36);
+    const startX = source.x + dx * trim;
+    const startY = source.y + dy * trim;
+    const endX = target.x - dx * trim;
+    const endY = target.y - dy * trim;
+    const relation = kind === 'canonical' ? 'canonical'
+      : relations.includes(edge.canonical_relation) ? edge.canonical_relation : 'off_flow';
     const line = document.createElementNS(svgNs, 'line');
-    line.setAttribute('x1', String(source.x));
-    line.setAttribute('y1', String(source.y));
-    line.setAttribute('x2', String(target.x));
-    line.setAttribute('y2', String(target.y));
-    const flowing = kind === 'observed' && edge.in_latest_turn === true && timing.running;
-    line.setAttribute('class', 'connectome-edge ' + kind + (flowing ? ' is-flowing' : '') + (kind === 'observed' && timing.historical ? ' is-historical' : ''));
-    line.setAttribute('marker-end', 'url(#connectome-arrow)');
-    line.setAttribute('aria-label', edge.source + ' → ' + edge.target);
+    line.setAttribute('x1', String(startX));
+    line.setAttribute('y1', String(startY));
+    line.setAttribute('x2', String(endX));
+    line.setAttribute('y2', String(endY));
+    const flowing = mode === 'live' && kind === 'observed' && edge.in_latest_turn === true && timing.running;
+    line.setAttribute('class', 'connectome-edge ' + kind + ' relation-' + relation + (flowing ? ' is-flowing' : '') + (kind === 'observed' && timing.historical ? ' is-historical' : ''));
+    line.setAttribute('marker-end', 'url(#connectome-arrow-' + relation + ')');
+    line.setAttribute('aria-label', edge.source + ' → ' + edge.target + ': ' + relation);
     const title = document.createElementNS(svgNs, 'title');
     title.textContent = kind === 'canonical'
       ? 'Etapa obligatoria declarada'
-      : 'Transición observada ' + String(edge.observed_count || 0) + ' veces; relación: ' + String(edge.canonical_relation || 'sin clasificar');
+      : 'Transición verificada ' + String(edge.observed_count || 0) + ' veces; relación: ' + relation +
+        (flowing ? '; ejecución reciente en curso' : '; observación histórica, sin actividad en vivo');
     line.append(title);
     svg.append(line);
   };
@@ -3696,11 +3818,12 @@ function renderObservedConnectome(snapshot) {
     const state = node.latest_turn_state || {};
     const phaseStatus = String(state.status || '').toUpperCase();
     const current = node.latest_turn_observed === true;
-    const active = timing.running && current && activeStatuses.has(phaseStatus);
-    const failed = phaseStatus === 'FAILED';
-    const visited = current && completedStatuses.has(phaseStatus);
+    const showsObservedTurn = presentation.showObserved;
+    const active = mode === 'live' && timing.running && current && activeStatuses.has(phaseStatus);
+    const failed = showsObservedTurn && current && phaseStatus === 'FAILED';
+    const visited = showsObservedTurn && current && completedStatuses.has(phaseStatus);
     const canonical = Number.isInteger(node.flow_stage_index);
-    group.setAttribute('class', 'connectome-node' + (canonical ? ' is-canonical' : '') + (active ? ' is-active' : '') + (failed ? ' is-failed' : '') + (visited ? ' is-visited' : '') + (current && timing.historical ? ' is-historical' : ''));
+    group.setAttribute('class', 'connectome-node' + (canonical ? ' is-canonical' : '') + (active ? ' is-active' : '') + (failed ? ' is-failed' : '') + (visited ? ' is-visited' : '') + (mode === 'history' && current ? ' is-historical' : ''));
     const rect = document.createElementNS(svgNs, 'rect');
     rect.setAttribute('x', String(point.x - 100));
     rect.setAttribute('y', String(point.y - 29));
@@ -3711,6 +3834,7 @@ function renderObservedConnectome(snapshot) {
     label.setAttribute('x', String(point.x));
     label.setAttribute('y', String(point.y + 4));
     label.setAttribute('text-anchor', 'middle');
+    // Two bounded SVG lines: never allow a long system ID to overprint adjacent nodes.
     const fullLabel = String(node.name || node.node_id);
     const labelParts = fullLabel.match(/.{1,17}/gu) || [''];
     const visibleParts = labelParts.slice(0, 2);
@@ -3726,19 +3850,22 @@ function renderObservedConnectome(snapshot) {
       label.append(tspan);
     });
     const title = document.createElementNS(svgNs, 'title');
-    title.textContent = node.node_id + ' · ' + String(node.path || 'ruta no declarada') + ' · ' + (current ? phaseStatus : 'sin observar en el último turno');
+    title.textContent = mode === 'architecture'
+      ? node.node_id + ' · ' + String(node.path || 'ruta no declarada') + ' · arquitectura declarada, no acredita ejecución'
+      : node.node_id + ' · ' + String(node.path || 'ruta no declarada') + ' · ' + (current ? phaseStatus : 'sin observar en el último turno');
     group.append(rect, label, title);
     svg.append(group);
   });
   graph.replaceChildren(svg);
   graph.setAttribute('aria-label', svg.getAttribute('aria-label'));
+  graph.dataset.correlationId = String(snapshot?.latest_turn?.correlation_id || '');
 
   const pathList = $('connectome-source-paths');
   if (pathList) {
     pathList.replaceChildren();
     nodes.forEach((node) => {
       const item = document.createElement('li');
-      item.textContent = node.node_id + ' → ' + String(node.path || 'RUTA NO DECLARADA');
+      item.textContent = connectomeNodeEvidenceLabel(node);
       pathList.append(item);
     });
   }
@@ -3759,30 +3886,52 @@ async function loadObservedConnectome() {
       throw new Error('connectome_schema_invalid');
     }
     renderObservedConnectome(snapshot);
-    const assessment = snapshot.assessment || {};
     const timestamp = snapshot.generated_at ? new Date(snapshot.generated_at).toLocaleTimeString('es') : 'hora no indicada';
     const latest = snapshot.latest_turn || {};
-    const correlation = latest.correlation_id ? ' · turno ' + String(latest.correlation_id).slice(0, 12) : '';
-    const terminal = latest.terminal_status ? ' · ' + String(latest.terminal_status) : '';
-    const timing = connectomeTurnTiming(snapshot);
-    const observedDate = latest.ended_at ? new Date(latest.ended_at).toLocaleString('es') : 'sin fecha';
-    const observationKind = timing.running ? 'ejecución reciente en curso' : 'HISTÓRICO, no es actividad en vivo';
-    status.textContent = connectomeAssessmentLabel(assessment.state) + ' · ' +
-      String(snapshot.node_count || 0) + ' nodos declarados · ' +
-      String(snapshot.coverage?.flow_stages_observed || 0) + '/' +
-      String(snapshot.coverage?.flow_stages_total || 0) + ' etapas observadas · ' + observationKind + ' · consultado ' + timestamp + ' · registrado ' + observedDate + correlation + terminal;
+    const declaredNodes = Number(snapshot.node_count || 0);
+    const presentation = connectomePresentation(snapshot, connectomeViewMode());
+    const { timing } = presentation;
+    status.textContent = connectomeStatusSummary(snapshot, presentation, timestamp);
     const unknown = Array.isArray(snapshot.drift?.unknown_observed_system_ids_latest)
       ? snapshot.drift.unknown_observed_system_ids_latest
       : [];
+    const missingSystemIds = Number(latest.phases_without_system_id || 0);
     const topologyError = snapshot.canonical_topology?.error;
     const warnings = [];
-    if (timing.historical && latest.available === true) warnings.push('La ruta coloreada corresponde al último turno registrado; la actualización de la página no significa que haya un turno nuevo.');
-    if (snapshot.drift?.committed_flow_contradiction_latest === true) warnings.push('CONTRADICCIÓN: el diario registra COMMITTED pero no demuestra el flujo obligatorio completo y ordenado.');
-    if (snapshot.evidence?.journal_integrity_verified !== true) warnings.push('Diario no verificado; no certificar el recorrido visual como actividad real.');
+    if (snapshot.canonical_topology?.exact_identity_contract_verified !== true) {
+      warnings.push('Inventario de ' + declaredNodes + ' identidades sin certificación exacta en el backend actual: no asumir que todos los nodos son los previstos.');
+    } else {
+      const signed = Number(snapshot.coverage?.verified_journal_observed_nodes || 0);
+      const emitters = Number(snapshot.coverage?.emitter_source_anchors_verified || 0);
+      const testsDeclared = Number(snapshot.coverage?.individual_behavior_tests_declared || 0);
+      const individual = Number(snapshot.coverage?.per_node_functional_certifications || 0);
+      const flowStages = Number(snapshot.coverage?.flow_stages_total || 0);
+      const nonFlowNodes = Math.max(0, declaredNodes - flowStages);
+      warnings.push('Inventario exacto ' + declaredNodes + '/' + declaredNodes + ' verificado. Contratos de pruebas individuales: ' + testsDeclared + '/' + nonFlowNodes + '. Emisores fuente localizados: ' + emitters + '/' + declaredNodes + '; nodos observados en diario: ' + signed + '/' + declaredNodes + '; certificaciones funcionales independientes en la release: ' + individual + '/' + declaredNodes + '. La existencia del archivo NO equivale a funcionamiento.');
+    }
+    if (presentation.mode === 'live' && timing.historical && latest.available === true) {
+      warnings.push('No hay actividad verificada en curso. El último turno solo se dibuja al elegir “Último turno histórico”.');
+    }
+    const showTurnDiagnostics = presentation.mode === 'history' || (presentation.mode === 'live' && timing.running);
+    if (showTurnDiagnostics && snapshot.drift?.committed_flow_contradiction_latest === true) {
+      warnings.push('CONTRADICCIÓN DE AUTORIDAD: el diario confirma COMMITTED, pero el recorrido canónico observado no está completo y ordenado. No equivale a una certificación del turno.');
+    }
+    if (showTurnDiagnostics && snapshot.evidence?.journal_integrity_verified !== true) {
+      const journalReason = snapshot.assessment?.reason || snapshot.evidence?.journal_error || 'no se recibió un diario verificado';
+      warnings.push('Recorrido no verificable: ' + String(journalReason));
+    }
     if (topologyError) warnings.push('Catálogo inválido: ' + String(topologyError));
-    if (unknown.length) warnings.push('IDs runtime sin declarar: ' + unknown.join(', '));
-    if ((snapshot.drift?.out_of_order_transitions_latest || 0) > 0) {
-      warnings.push('Transiciones fuera de orden: ' + String(snapshot.drift.out_of_order_transitions_latest));
+    if (showTurnDiagnostics && missingSystemIds > 0) {
+      warnings.push('Eventos del último turno sin system_id: ' + missingSystemIds + '. No pueden dibujarse como caminos verificados.');
+    }
+    if (showTurnDiagnostics && unknown.length) warnings.push('IDs runtime sin declarar: ' + unknown.join(', '));
+    const missingStages = Array.isArray(snapshot.drift?.skipped_required_stages_latest)
+      ? snapshot.drift.skipped_required_stages_latest : [];
+    if (showTurnDiagnostics && missingStages.length) {
+      warnings.push('Etapas obligatorias sin evidencia en este turno: ' + missingStages.join(', '));
+    }
+    if (showTurnDiagnostics && (snapshot.drift?.out_of_order_transitions_latest || 0) > 0) {
+      warnings.push('Etapas observadas por primera vez fuera de orden: ' + String(snapshot.drift.out_of_order_transitions_latest));
     }
     if (alert && warnings.length) {
       alert.textContent = warnings.join(' · ');
@@ -3806,31 +3955,6 @@ function scheduleConnectomeRefresh() {
     state.connectomePollTimer = null;
     if (state.view === 'system') void loadObservedConnectome();
   }, 5000);
-}
-
-function systemObservationHint(observation) {
-  if (observation?.status !== 'rejected') return '';
-  const error = observation.reason;
-  if (error?.code === 'AUTH_REQUIRED') return 'La sesión ha caducado; vuelve a iniciar sesión.';
-  const http = Number(error?.status);
-  if (Number.isInteger(http) && http >= 400 && http <= 599) {
-    return 'La consulta devolvió HTTP ' + http + '. No se ha certificado el contrato de esta conexión.';
-  }
-  return 'La consulta no recibió una respuesta verificable del servidor.';
-}
-
-function systemReadinessHint(observation) {
-  if (observation?.status !== 'fulfilled') return systemObservationHint(observation);
-  const result = observation.value || {};
-  if (result.status === 200 && result.body?.ready === true) return '';
-  const body = result.body || {};
-  const missing = [
-    ['API cognitiva', body.upstream_ready],
-    ['inventario', body.inventory_complete],
-    ['espacio de trabajo', body.workspace_closure_complete],
-  ].filter(([, value]) => value === false).map(([name]) => name);
-  if (missing.length) return 'Sin preparar: ' + missing.join(', ') + '.';
-  return 'La consola no acredita preparación completa (HTTP ' + String(result.status || 'desconocido') + ').';
 }
 
 async function loadSystemStatus() {
@@ -3858,13 +3982,7 @@ async function loadSystemStatus() {
   grid.append(runtimeCard('Preparación operativa', ready ? 'Preparada' : readiness.status === 'fulfilled' ? 'Requiere atención' : 'Sin verificar', readiness.status === 'fulfilled' ? 'Estado comunicado por /ready: HTTP ' + readiness.value.status + '. El proceso activo y la preparación completa se comprueban por separado.' : 'No se pudo consultar la preparación.', ready));
   const privateBody = privacy.status === 'fulfilled' ? privacy.value : null;
   const network = privateBody?.network_scope;
-  const publicPagesBridge = Boolean(globalThis.SheilyPagesTransport);
-  grid.append(runtimeCard('Acceso y privacidad',
-    publicPagesBridge ? 'Pasarela HTTPS · núcleo local' : network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar',
-    publicPagesBridge
-      ? 'La consola y los datos siguen en el servidor privado. La pasarela expone las funciones de propietario mediante una lista cerrada; cada control mantiene la autorización y confirmación exigidas por el servidor.'
-      : privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.',
-    publicPagesBridge ? privateBody !== null : network === 'LOOPBACK_ONLY'));
+  grid.append(runtimeCard('Acceso y privacidad', network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar', privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.', network === 'LOOPBACK_ONLY'));
   const mb = lifelongMemory.status === 'fulfilled' ? lifelongMemory.value : null;
   grid.append(runtimeCard('Lifelong Memory', mb?.available === true ? 'Conectado' : mb?.enabled === false ? 'Desactivado' : 'Sin verificar', mb?.available === true ? 'Fuentes y trabajos disponibles mediante SHEILY.' : 'La integración no ha confirmado disponibilidad.', mb?.available === true));
   const checks = $('system-integration-checks'); checks.replaceChildren();
@@ -3874,6 +3992,15 @@ async function loadSystemStatus() {
   const historyReachable = valueOrUnknown(history, body => body?.read_only === true && Array.isArray(body.turns) && /^[a-f0-9]{64}$/.test(body.history_version || ''));
   const jobsReachable = valueOrUnknown(jobs, body => body?.ok === true && Array.isArray(body.jobs));
   const tidexReachable = valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
+  // An upstream release gate is not evidence that personal notes or scoped
+  // selection are defective. Keep both unverified until a real 200 contract
+  // arrives, while surfacing the shared blocker instead of hiding its cause.
+  const releaseGateBlocked = observation => observation.status === 'rejected'
+    && observation.reason?.status === 503
+    && observation.reason?.message === 'production_release_not_certified';
+  const releaseBlockedChecks = new Set();
+  if (releaseGateBlocked(notes)) releaseBlockedChecks.add('Notas con versiones y sustitución atómica accesibles');
+  if (releaseGateBlocked(selection)) releaseBlockedChecks.add('Selección vinculada al sujeto y conversación');
   const entries = [
     ['Consola y API SHEILY preparadas', ready === true ? true : readiness.status === 'fulfilled' ? false : null],
     ['Fuentes originales de Lifelong Memory íntegras', mb?.archive?.integrity?.verified ?? null],
@@ -3884,35 +4011,15 @@ async function loadSystemStatus() {
     ['Servicio de evaluación y promoción TIDEX consultable', tidexReachable],
     ['Entrenador de fuentes canónicas preparado', mb?.training?.canonical_enabled === true ? true : mb?.training?.canonical_enabled === false ? false : null],
   ];
-  const diagnostics = new Map([
-    ['Consola y API SHEILY preparadas', ready ? '' : systemReadinessHint(readiness)],
-    ['Notas con versiones y sustitución atómica accesibles',
-      notesReachable === true ? '' : notes.status === 'rejected'
-        ? systemObservationHint(notes) : 'La respuesta no acredita el contrato de notas y sustitución atómica.'],
-    ['Selección vinculada al sujeto y conversación',
-      sessionScoped === true ? '' : selection.status === 'rejected'
-        ? systemObservationHint(selection) : 'La respuesta no acredita las vinculaciones de identidad y conversación.'],
-    ['Servicio de evaluación y promoción TIDEX consultable',
-      tidexReachable === true ? '' : systemObservationHint(tidex)],
-  ]);
   for (const [label, result] of entries) {
     const row = document.createElement('div'); row.className = 'check-row';
-    const name = document.createElement('span'); name.className = 'check-row-name';
-    const heading = document.createElement('span'); heading.textContent = label;
-    name.append(heading);
-    const hint = diagnostics.get(label) || '';
-    if (hint) {
-      const note = document.createElement('small'); note.className = 'check-row-diagnostic';
-      note.textContent = hint;
-      name.append(note);
-    }
-    const value = document.createElement('strong'); value.textContent =
-      result === true ? 'Comprobado'
-      : result === false ? 'Pendiente' : 'No verificado';
+    const name = document.createElement('span'); name.textContent = label;
+    const value = document.createElement('strong'); value.textContent = result === true ? 'Comprobado' : releaseBlockedChecks.has(label) ? 'Bloqueado: release no certificada' : result === false ? 'Pendiente' : 'No verificado';
     row.append(name, value); checks.append(row);
   }
   const checked = entries.filter(([, result]) => result === true).length;
-  $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones verificables comprobadas en esta consulta.'
+  $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones comprobadas en esta consulta.'
+    + (releaseBlockedChecks.size ? ' ' + releaseBlockedChecks.size + ' consultas bloqueadas por certificación de producción; no son fallos certificados de sus módulos.' : '')
     + (tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
     + ' La verificación de migración y recuperación se documenta en el informe de instalación.';
   $('system-observed').textContent = 'Última consulta: ' + new Date().toLocaleString('es') + '. Cada operación devuelve su propio resultado.';
@@ -4000,8 +4107,9 @@ function bindProfessionalWorkspace() {
   $('inference-inherit').addEventListener('click', () => void changeInferenceSelection(true));
   $('system-refresh').addEventListener('click', loadSystemStatus);
   $('connectome-refresh').addEventListener('click', () => void loadObservedConnectome());
-  $('connectome-latest-only')?.addEventListener('change', () => void loadObservedConnectome());
-  $('connectome-show-architecture')?.addEventListener('change', () => void loadObservedConnectome());
+  document.querySelectorAll('input[name="connectome-mode"]').forEach((control) => {
+    control.addEventListener('change', () => void loadObservedConnectome());
+  });
   $('admin-refresh').addEventListener('click', loadControlAccess);
   $('admin-runtime-tick').addEventListener('click', () => void executeAdminAction('runtime_tick'));
   $('admin-consolidate').addEventListener('click', () => void executeAdminAction('sleep_consolidation'));
@@ -7744,7 +7852,7 @@ function bindEvents() {
         return;
       }
       testVoiceBtn.textContent = '⏹️ Detener prueba';
-      const sample = '¡Hola usuario! Soy Sheily. Ahora mi voz es completamente femenina, viva y expresiva. Modularé con entusiasmo cuando tengamos buenas noticias, hablaré con calma en temas privados, y haré preguntas con entonación natural. ¿Qué te parece cómo suena mi voz ahora?';
+      const sample = '¡Hola Sergio! Soy Sheily. Ahora mi voz es completamente femenina, viva y expresiva. Modularé con entusiasmo cuando tengamos buenas noticias, hablaré con calma en temas privados, y haré preguntas con entonación natural. ¿Qué te parece cómo suena mi voz ahora?';
       SheilyVoice.speak(
         sample,
         () => {

@@ -2,16 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#355f4f">
   <meta name="description" content="Tu espacio personal con SHEILY para pensar, crear y avanzar.">
   <title>SHEILY · Tu espacio personal</title>
-  <script>
-    if (window.location.protocol === 'file:') {
-      window.location.replace('https://sheily-ai.github.io/.github/' + (window.location.hash || '#system'));
-    }
-  </script>
   <link rel="stylesheet" href="./assets/site.css">
   <link rel="stylesheet" href="./assets/workspace.css">
   <script defer src="./assets/vendor/markdown-it.min.js"></script>
@@ -20,10 +14,9 @@
   <script defer src="./assets/results.js"></script>
   <script defer src="./assets/memory-export.js"></script>
   <script defer src="./assets/uploads.js"></script>
+  <script defer src="./assets/site.js"></script>
   <script defer src="./assets/pages-guard.js"></script>
-  <script defer src="./assets/pages-live-transport.js?v=66edda2"></script>
-  <script defer src="./assets/neural-status.js?v=032d964"></script>
-  <script defer src="./assets/site.js?v=66edda2"></script>
+  <script defer src="./assets/pages-live-transport.js"></script>
 </head>
 <body>
   <div class="app-shell" id="app-shell" hidden>
@@ -95,7 +88,7 @@
       </button>
       <button class="profile-button" type="button" data-view="settings">
         <span class="avatar" id="sidebar-avatar">S</span>
-        <span><strong id="sidebar-profile-name">Usuario</strong><small id="connection-label">Conectando…</small></span>
+        <span><strong id="sidebar-profile-name">Sergio</strong><small id="connection-label">Conectando…</small></span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
       </button>
     </aside>
@@ -124,14 +117,15 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-5 4 10 2-5h7"/><circle cx="12" cy="12" r="9"/></svg>
           <span>Contexto</span>
         </button>
-        <button class="icon-button theme-button" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg></button>
+        <button class="icon-button theme-button" id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">◐</button>
         <button class="icon-button" id="new-chat-mobile" type="button" aria-label="Nueva conversación">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
         </button>
       </header>
+
       <div id="sheily-pages-status" class="pages-notice" role="status">
         <span class="pages-notice-dot" aria-hidden="true"></span>
-        <div class="pages-notice-copy"><strong>Vista pública · comprobando conexión privada</strong><p>La interfaz se sirve desde GitHub Pages. Las funciones de propietario solo se habilitan cuando responde la pasarela HTTPS autenticada; ninguna clave se guarda en GitHub Pages.</p></div>
+        <div class="pages-notice-copy"><strong>Web pública · comprobando conexión privada</strong><p>La interfaz procede del código canónico de SHEILY. Las funciones privadas solo se habilitan cuando responde la pasarela HTTPS autenticada; ninguna clave se guarda en GitHub Pages.</p></div>
       </div>
 
       <aside id="context-inspector-panel" class="context-inspector-panel" aria-label="Inspector de contexto y privacidad" hidden>
@@ -596,23 +590,28 @@
         <section class="workspace-card" aria-labelledby="system-cutover-title"><div class="section-heading"><div><h2 id="system-cutover-title">Conexiones de SHEILY</h2><p>Estado actual de las conexiones de memoria, historial y aprendizaje.</p></div></div><p id="system-cutover-verdict" class="section-status" role="status" aria-live="polite">Pendiente de consultar los servicios.</p><div id="system-integration-checks" class="check-list"></div><div class="head-actions"><button type="button" class="secondary-button" data-view="memory">Ver memoria y versiones</button><button type="button" class="secondary-button" data-view="learning">Ver fuentes, trabajos y adaptadores</button><button type="button" class="secondary-button" data-view="vault">Comprobar zona privada</button></div></section>
         <section class="workspace-card connectome-card" aria-labelledby="connectome-title">
           <div class="section-heading">
-            <div><h2 id="connectome-title">Conectome: arquitectura y recorrido observado</h2><p>Catálogo de sistemas declarado, flujo obligatorio y transiciones del diario nativo verificado. Solo lectura.</p></div>
-            <button class="secondary-button" id="connectome-refresh" type="button">Actualizar último registro</button>
+            <div><h2 id="connectome-title">Conectome: actividad, historial y arquitectura</h2><p>Separa la ejecución actual, el último turno registrado y el flujo obligatorio declarado. Solo lectura.</p></div>
+            <button class="secondary-button" id="connectome-refresh" type="button">Comprobar ahora</button>
           </div>
           <p id="connectome-status" class="section-status" role="status" aria-live="polite">Pendiente de consultar el diario verificado.</p>
           <div id="connectome-alert" class="connectome-alert" role="status" aria-live="polite" hidden></div>
           <div class="connectome-legend" aria-label="Leyenda del diagrama">
             <span><i class="legend-dot declared"></i>Sistema declarado</span>
             <span><i class="legend-dot canonical"></i>Etapa obligatoria</span>
-            <span><i class="legend-dot observed"></i>Transición observada</span>
-            <span><i class="legend-dot off-flow"></i>Transición adicional</span>
+            <span><i class="legend-dot forward"></i>Avance normal</span>
+            <span><i class="legend-dot skip-forward"></i>Salto de etapa</span>
+            <span><i class="legend-dot backward"></i>Retroceso</span>
+            <span><i class="legend-dot off-flow"></i>Rama fuera del flujo</span>
             <span><i class="legend-dot failure-journal"></i>Registro de fallo</span>
             <span><i class="legend-dot active"></i>Etapa activa según el diario</span>
           </div>
-          <div class="connectome-scope">
-            <label><input id="connectome-latest-only" type="checkbox" checked>Mostrar solo transiciones del último turno verificado</label>
-            <label><input id="connectome-show-architecture" type="checkbox">Mostrar también el flujo obligatorio predefinido</label>
-          </div>
+          <fieldset class="connectome-scope" aria-label="Vista del Conectome">
+            <legend>Qué quieres ver</legend>
+            <label><input id="connectome-mode-live" name="connectome-mode" type="radio" value="live" checked>En vivo ahora</label>
+            <label><input id="connectome-mode-history" name="connectome-mode" type="radio" value="history">Último turno histórico</label>
+            <label><input id="connectome-mode-architecture" name="connectome-mode" type="radio" value="architecture">Arquitectura declarada</label>
+          </fieldset>
+          <div id="connectome-empty" class="connectome-empty" role="status" hidden></div>
           <div id="connectome-graph" class="connectome-graph" role="img" aria-label="Diagrama del conectome de SHEILY"></div>
           <details class="connectome-paths"><summary>Ver todos los nodos y sus rutas fuente declaradas</summary><ol id="connectome-source-paths"></ol></details>
         </section>
@@ -655,7 +654,7 @@
                 <span class="avatar large" id="settings-avatar-preview">S</span>
                 <div>
                   <span class="panel-kicker">IDENTIDAD DEL ESPACIO</span>
-                  <h2 id="settings-owner-heading">Usuario</h2>
+                  <h2 id="settings-owner-heading">Sergio</h2>
                   <p id="settings-owner-subheading">Propietario y autoridad de este espacio</p>
                 </div>
               </div>
@@ -664,7 +663,7 @@
             <div class="settings-form-grid">
               <label class="settings-field">
                 <span>Nombre visible</span>
-                <input id="setting-display-name" type="text" maxlength="48" value="Usuario" placeholder="Tu nombre">
+                <input id="setting-display-name" type="text" maxlength="48" value="Sergio" placeholder="Tu nombre">
               </label>
               <label class="settings-field">
                 <span>Rol o descripción</span>
