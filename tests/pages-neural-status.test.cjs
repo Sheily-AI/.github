@@ -37,3 +37,9 @@ test('index loads one system panel and a notice that transport can update', () =
   assert.match(js, /system\.after\(panel\)/);
   assert.doesNotMatch(js, /cloneNode/);
 });
+
+test('a local file opens the functional HTTPS publication', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  assert.match(html, /window\.location\.protocol === 'file:'/);
+  assert.match(html, /window\.location\.replace\('https:\/\/sheily-ai\.github\.io\/\.github\/'/);
+});

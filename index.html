@@ -7,6 +7,11 @@
   <meta name="theme-color" content="#355f4f">
   <meta name="description" content="Tu espacio personal con SHEILY para pensar, crear y avanzar.">
   <title>SHEILY · Tu espacio personal</title>
+  <script>
+    if (window.location.protocol === 'file:') {
+      window.location.replace('https://sheily-ai.github.io/.github/' + (window.location.hash || '#system'));
+    }
+  </script>
   <link rel="stylesheet" href="./assets/site.css">
   <link rel="stylesheet" href="./assets/workspace.css">
   <script defer src="./assets/vendor/markdown-it.min.js"></script>
