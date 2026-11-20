@@ -7,8 +7,8 @@
   const originalFetch = root.fetch.bind(root);
   let bridgeSession = '';
   const PUBLIC_PATH = /^\/(?:api\/|health(?:\/|$)|ready(?:\/|$))/;
-  const PRIVATE_PATH = /^\/api\/(?:admin(?:\/|$)|vault(?:\/|$)|tidex(?:\/|$)|auth\/setup(?:\/|$)|workspace(?:\/|$))/;
-  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/.*)?|control\/(?:turns(?:\/.*)?|access)|attachments(?:\/.*)?|memories(?:\/.*)?|settings|privacy|inference\/session-selection(?:\/.*)?|lifelong-memory(?:\/.*)?|overview|meta|artifacts\/download|previews(?:\/.*)?|connectome\/observed|tts\/speak)$/;
+  const PRIVATE_PATH = /^\/api\/(?:admin(?:\/|$)|tidex(?:\/|$)|auth\/setup(?:\/|$)|workspace(?:\/|$))/;
+  const SAFE_PATH = /^\/api\/(?:auth\/(?:session|status)|chat|conversations(?:\/.*)?|control\/(?:turns(?:\/.*)?|access)|attachments(?:\/.*)?|memories(?:\/.*)?|settings|privacy|vault(?:\/.*)?|inference\/session-selection(?:\/.*)?|lifelong-memory(?:\/.*)?|overview|meta|artifacts\/download|previews(?:\/.*)?|connectome\/observed|tts\/speak)$/;
   function sourceUrl(input) {
     const raw = typeof input === 'string' ? input : input && typeof input.href === 'string' ? input.href : input && input.url;
     return new URL(raw, root.location.href);
@@ -140,7 +140,7 @@
   });
 
   if (root.document) root.document.addEventListener('DOMContentLoaded', async () => {
-    for (const element of root.document.querySelectorAll('[data-view="admin"], [data-view="vault"]')) element.hidden = true;
+    for (const element of root.document.querySelectorAll('[data-view="admin"]')) element.hidden = true;
     const status = root.document.querySelector('#sheily-pages-status');
     if (!status) return;
     try {
@@ -149,7 +149,7 @@
         status.querySelector('strong').textContent = 'Consola remota accesible';
         status.classList.add('is-live');
         const paragraph = status.querySelector('p');
-        if (paragraph) paragraph.textContent = 'La conexión HTTPS responde. Introduce tu contraseña en el formulario para acceder al chat real. La clave se conserva solo en memoria mientras esta pestaña esté abierta; administración y custodia privada no se exponen.';
+        if (paragraph) paragraph.textContent = 'La conexión HTTPS responde. Introduce tu contraseña para acceder al chat y a Custodia Privada. Las claves y las sesiones privadas se conservan en memoria del puente y no se guardan en GitHub Pages; la administración no se expone.';
       }
     } catch { /* Keep the accurate disconnected banner. */ }
   });

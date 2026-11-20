@@ -31,8 +31,8 @@
     ],
     "caveats": [
       "El beneficio sobre SHEILY todavía no está demostrado.",
-      "ANC está diseñado como trabajador separado del turno; no está demostrado que se encuentre activo en producción ni forma parte del recorrido del Conectome.",
-      "El catálogo del Conectome declara 24 sistemas; solo shei.neural.mesh es neuronal. Añadir ANC exige un cambio de versión del catálogo."
+      "ANC está diseñado como trabajador separado del turno; no está demostrado que se encuentre activo en producción ni que participe en el último recorrido observado.",
+      "El catálogo actualizado del Conectome declara 25 sistemas e incluye shei.neural.anc y shei.neural.mesh; la declaración no demuestra activación ni ejecución."
     ]
   }
 }

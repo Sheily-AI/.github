@@ -14,6 +14,17 @@ test('snapshot declares ANC honestly', () => {
   assert.equal(s.benefitDemonstrated, false);
   assert.ok(data.anc.pipeline.length >= 5);
   assert.match(data.anc.caveats.join(' '), /no está demostrado que se encuentre activo/);
+  assert.match(data.anc.caveats.join(' '), /25 sistemas/);
+  assert.match(data.anc.caveats.join(' '), /shei\.neural\.anc/);
+});
+
+test('public connectome exposes current history and architecture controls', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const js = fs.readFileSync(path.join(root, 'assets/site.js'), 'utf8');
+  assert.match(html, /id="connectome-latest-only"/);
+  assert.match(html, /id="connectome-show-architecture"/);
+  assert.match(js, /connectome-show-architecture/);
+  assert.match(js, /edge\.in_latest_turn === true/);
 });
 test('index loads the panel script and a notice that transport can update', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');

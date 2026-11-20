@@ -3410,7 +3410,7 @@ button:not(:disabled), summary { cursor: pointer; }
 .connectome-edge.relation-off_flow, .connectome-edge.relation-same_stage { stroke: #7651b4; stroke-dasharray: 10 4 2 4; }
 .connectome-edge.relation-failure_journal { stroke: #b91c1c; stroke-width: 3; }
 .connectome-edge.is-flowing { stroke-width: 3.5; opacity: 1; animation: connectome-flow 1.4s linear infinite; stroke-dasharray: 9 6; }
-.connectome-edge.observed.is-historical { stroke: #879591; opacity: .38; animation: none; }
+.connectome-edge.observed.is-historical { opacity: .62; animation: none; }
 .connectome-node rect { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1.25; transition: stroke .15s ease, filter .15s ease; }
 .connectome-node:hover rect { stroke: var(--soft-muted); filter: drop-shadow(0 2px 5px rgba(0,0,0,.06)); }
 .connectome-node text { fill: var(--ink); font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; font-weight: 500; letter-spacing: -.2px; text-rendering: geometricPrecision; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; stroke: none; paint-order: normal; filter: none; text-shadow: none; pointer-events: none; user-select: none; }
@@ -3420,7 +3420,7 @@ button:not(:disabled), summary { cursor: pointer; }
 .connectome-node.is-active rect { stroke: #0d9488; stroke-width: 2.25; filter: drop-shadow(0 0 6px rgba(13,148,136,.4)); animation: connectome-node-pulse 1.3s ease-in-out infinite; }
 .connectome-node.is-active text { fill: #087d76; font-weight: 600; }
 .connectome-node.is-failed rect { stroke: #c64c45; fill: rgba(198,76,69,.12); }
-.connectome-scope { margin: 10px 0; font-size: 13px; color: var(--muted); }
+.connectome-scope { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 10px 0; font-size: 13px; color: var(--muted); }
 .connectome-scope label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .connectome-alert { padding: 10px 13px; margin: 10px 0; border-left: 3px solid #cf8052; border-radius: 0 8px 8px 0; background: rgba(207,128,82,.1); color: var(--ink); font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 .connectome-paths { margin-top: 14px; color: var(--muted); font-size: 12px; }

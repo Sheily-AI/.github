@@ -3623,11 +3623,14 @@ function renderObservedConnectome(snapshot) {
   const nodeIds = new Set(nodes.map((node) => node.node_id));
   const timing = connectomeTurnTiming(snapshot);
   const governing = snapshot?.governing_connectome;
-  const canonicalEdges = Array.isArray(governing?.edges)
+  const showArchitecture = $('connectome-show-architecture')?.checked === true;
+  const canonicalEdges = showArchitecture && Array.isArray(governing?.edges)
     ? governing.edges.filter((edge) => edge?.enforced === true && nodeIds.has(edge.source) && nodeIds.has(edge.target))
     : [];
+  const latestOnly = $('connectome-latest-only')?.checked !== false;
   const observedEdges = Array.isArray(snapshot?.edges)
-    ? snapshot.edges.filter((edge) => edge?.verified === true && nodeIds.has(edge.source) && nodeIds.has(edge.target))
+    ? snapshot.edges.filter((edge) => edge?.verified === true && nodeIds.has(edge.source) && nodeIds.has(edge.target) &&
+        (!latestOnly || edge.in_latest_turn === true))
     : [];
   const columns = 4;
   const cellWidth = 226;
@@ -3859,7 +3862,7 @@ async function loadSystemStatus() {
   grid.append(runtimeCard('Acceso y privacidad',
     publicPagesBridge ? 'Pasarela HTTPS · núcleo local' : network === 'LOOPBACK_ONLY' ? 'Acceso local' : network ? String(network) : 'Sin verificar',
     publicPagesBridge
-      ? 'La consola y los datos siguen en el servidor privado. Este acceso HTTPS tiene sesión de propietario y no habilita administración, bóveda ni TIDEX.'
+      ? 'La consola y los datos siguen en el servidor privado. Este acceso HTTPS habilita chat y Custodia Privada con sesiones independientes; administración y TIDEX no se exponen.'
       : privateBody ? 'Ámbito comunicado por el servidor. La bóveda tiene su desbloqueo independiente.' : 'No se pudo verificar el ámbito de acceso.',
     publicPagesBridge ? privateBody !== null : network === 'LOOPBACK_ONLY'));
   const mb = lifelongMemory.status === 'fulfilled' ? lifelongMemory.value : null;
@@ -4005,6 +4008,8 @@ function bindProfessionalWorkspace() {
   $('inference-inherit').addEventListener('click', () => void changeInferenceSelection(true));
   $('system-refresh').addEventListener('click', loadSystemStatus);
   $('connectome-refresh').addEventListener('click', () => void loadObservedConnectome());
+  $('connectome-latest-only')?.addEventListener('change', () => void loadObservedConnectome());
+  $('connectome-show-architecture')?.addEventListener('change', () => void loadObservedConnectome());
   $('admin-refresh').addEventListener('click', loadControlAccess);
   $('admin-runtime-tick').addEventListener('click', () => void executeAdminAction('runtime_tick'));
   $('admin-consolidate').addEventListener('click', () => void executeAdminAction('sleep_consolidation'));

@@ -126,7 +126,7 @@
       </header>
       <div id="sheily-pages-status" class="pages-notice" role="status">
         <span class="pages-notice-dot" aria-hidden="true"></span>
-        <div class="pages-notice-copy"><strong>Vista pública · motor no conectado</strong><p>Esta copia sirve la interfaz desde GitHub Pages. El servidor cognitivo, el historial y las acciones no están disponibles aquí, y las peticiones de autenticación se bloquean hasta disponer de una pasarela HTTPS validada. No introduzcas claves.</p></div>
+        <div class="pages-notice-copy"><strong>Vista pública · comprobando conexión privada</strong><p>La interfaz se sirve desde GitHub Pages. El chat y Custodia Privada solo se habilitan cuando responde la pasarela HTTPS autenticada; ninguna clave se guarda en GitHub Pages.</p></div>
       </div>
 
       <aside id="context-inspector-panel" class="context-inspector-panel" aria-label="Inspector de contexto y privacidad" hidden>
@@ -592,7 +592,7 @@
         <section class="workspace-card connectome-card" aria-labelledby="connectome-title">
           <div class="section-heading">
             <div><h2 id="connectome-title">Conectome: arquitectura y recorrido observado</h2><p>Catálogo de sistemas declarado, flujo obligatorio y transiciones del diario nativo verificado. Solo lectura.</p></div>
-            <button class="secondary-button" id="connectome-refresh" type="button">Actualizar recorrido</button>
+            <button class="secondary-button" id="connectome-refresh" type="button">Actualizar último registro</button>
           </div>
           <p id="connectome-status" class="section-status" role="status" aria-live="polite">Pendiente de consultar el diario verificado.</p>
           <div id="connectome-alert" class="connectome-alert" role="status" aria-live="polite" hidden></div>
@@ -600,7 +600,13 @@
             <span><i class="legend-dot declared"></i>Sistema declarado</span>
             <span><i class="legend-dot canonical"></i>Etapa obligatoria</span>
             <span><i class="legend-dot observed"></i>Transición observada</span>
+            <span><i class="legend-dot off-flow"></i>Transición adicional</span>
+            <span><i class="legend-dot failure-journal"></i>Registro de fallo</span>
             <span><i class="legend-dot active"></i>Etapa activa según el diario</span>
+          </div>
+          <div class="connectome-scope">
+            <label><input id="connectome-latest-only" type="checkbox" checked>Mostrar solo transiciones del último turno verificado</label>
+            <label><input id="connectome-show-architecture" type="checkbox">Mostrar también el flujo obligatorio predefinido</label>
           </div>
           <div id="connectome-graph" class="connectome-graph" role="img" aria-label="Diagrama del conectome de SHEILY"></div>
           <details class="connectome-paths"><summary>Ver todos los nodos y sus rutas fuente declaradas</summary><ol id="connectome-source-paths"></ol></details>

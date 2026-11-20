@@ -53,12 +53,17 @@ test('owner password is used once then only an opaque server ticket is sent', as
   assert.equal(calls.at(-1).options.headers.has('x-sheily-bridge-session'), false);
 });
 
-test('private administration, vault, arbitrary endpoints and setup are blocked', async () => {
+test('private administration and arbitrary endpoints stay blocked while vault uses the owner ticket', async () => {
   const {calls, sandbox} = build();
-  for (const path of ['/api/admin/health','/api/vault/items','/api/tidex/status','/api/auth/setup','/api/workspace/closure','/api/shell']) {
+  for (const path of ['/api/admin/health','/api/tidex/status','/api/auth/setup','/api/workspace/closure','/api/shell']) {
     await assert.rejects(sandbox.fetch(path),/no está habilitada/);
   }
   assert.equal(calls.length,0);
+  await sandbox.fetch('/api/auth/session', {method:'POST', body:JSON.stringify({token:'SomeSecurePassword2026'})});
+  await sandbox.fetch('/api/vault/items');
+  assert.equal(calls[1].url, 'https://yo-venus-series.tail2ed060.ts.net:8443/api/vault/items');
+  assert.equal(calls[1].options.headers.get('x-sheily-bridge-session'), 'x'.repeat(43));
+  assert.equal(calls[1].options.credentials, 'omit');
 });
 
 test('outside requests are not forwarded to SHEILY backend', async () => {
