@@ -25,18 +25,13 @@
     let data;
     try { const r = await fetch('./assets/neural-status.json', { cache: 'no-cache' }); if (!r.ok) return; data = await r.json(); } catch { return; }
     const panel = render(data); if (!panel) return;
-    const learning = document.getElementById('view-learning');
-    const anchor = learning && learning.querySelector('.lifelong-memory-panel');
-    if (anchor) anchor.before(panel);
     const system = document.getElementById('system-status-grid');
     if (system) {
-      const mini = panel.cloneNode(true);
-      mini.id = 'anc-system';
-      const miniTitle = mini.querySelector('h2');
-      if (miniTitle) miniTitle.id = 'anc-system-title';
-      mini.setAttribute('aria-labelledby', 'anc-system-title');
-      mini.querySelector('.anc-pipeline')?.remove();
-      system.after(mini);
+      panel.id = 'anc-system';
+      const title = panel.querySelector('h2');
+      if (title) title.id = 'anc-system-title';
+      panel.setAttribute('aria-labelledby', 'anc-system-title');
+      system.after(panel);
     }
   }
   if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', init);

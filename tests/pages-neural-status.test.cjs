@@ -26,13 +26,14 @@ test('public connectome exposes current history and architecture controls', () =
   assert.match(js, /connectome-show-architecture/);
   assert.match(js, /edge\.in_latest_turn === true/);
 });
-test('index loads the panel script and a notice that transport can update', () => {
+test('index loads one system panel and a notice that transport can update', () => {
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   assert.match(html, /neural-status\.js/);
   const m = html.match(/<div id="sheily-pages-status"[\s\S]*?<\/div>\s*<\/div>/);
   assert.ok(m && /<strong>/.test(m[0]) && /<p>/.test(m[0]));
   assert.doesNotMatch(html, /style="position:fixed;z-index:999999/);
   const js = fs.readFileSync(path.join(root, 'assets/neural-status.js'), 'utf8');
-  assert.match(js, /miniTitle\.id = 'anc-system-title'/);
-  assert.match(js, /mini\.setAttribute\('aria-labelledby', 'anc-system-title'\)/);
+  assert.match(js, /title\.id = 'anc-system-title'/);
+  assert.match(js, /system\.after\(panel\)/);
+  assert.doesNotMatch(js, /cloneNode/);
 });
