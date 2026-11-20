@@ -45,6 +45,7 @@ const state = {
   controlRequestId: 0,
   adminBusy: false,
   systemRequestId: 0,
+  systemPollTimer: null,
   connectomeRequestId: 0,
   connectomePollTimer: null,
   inferenceSelection: null,
@@ -331,6 +332,10 @@ function setView(view, options = {}) {
   if (view !== 'system' && state.connectomePollTimer) {
     clearTimeout(state.connectomePollTimer);
     state.connectomePollTimer = null;
+  }
+  if (view !== 'system' && state.systemPollTimer) {
+    clearTimeout(state.systemPollTimer);
+    state.systemPollTimer = null;
   }
   if (view !== 'chat') {
     SheilyResults.close();
@@ -2916,6 +2921,9 @@ async function sendMessage(message) {
     if (thinking) {
       await streamAssistantReply(thinking, reply, body);
     }
+    // The connections view must reflect the runtime that produced this reply,
+    // even when it is currently hidden behind the chat view.
+    void loadSystemStatus();
     await loadConversations({ quiet: true });
   } catch (error) {
     const requestDispatchedWithoutResponse = chatDispatched && !chatResponseReceived;
@@ -3660,6 +3668,25 @@ function connectomeNodeEvidenceLabel(node) {
     ' · certificación funcional individual: NO ACREDITADA';
 }
 
+// ANC is a declared, latent post-turn neural system. Its presence in the
+// catalogue and an event in a verified journal are distinct from live runtime
+// activity, learning, or functional certification.
+function connectomeAncStatus(snapshot) {
+  const anc = Array.isArray(snapshot?.nodes)
+    ? snapshot.nodes.find((node) => node?.node_id === 'shei.neural.anc')
+    : null;
+  if (anc?.declared !== true) {
+    return 'ANC (Adaptive Neural Core): no consta como sistema neural declarado en el catálogo recibido; no se infiere actividad.';
+  }
+  if (snapshot?.evidence?.journal_integrity_verified !== true || snapshot?.latest_turn?.available !== true) {
+    return 'ANC (Adaptive Neural Core): sistema neural declarado. El último turno verificado no está disponible; no se afirma actividad ni aprendizaje.';
+  }
+  if (anc.latest_turn_observed === true) {
+    return 'ANC (Adaptive Neural Core): sistema neural declarado y observado en el último turno verificado. Esa observación no acredita actividad actual, aprendizaje ni certificación funcional.';
+  }
+  return 'ANC (Adaptive Neural Core): sistema neural declarado, pero no observado en el último turno verificado. No se afirma inactividad fuera de ese turno ni aprendizaje.';
+}
+
 function connectomeViewMode() {
   const selected = document.querySelector('input[name="connectome-mode"]:checked');
   return ['live', 'history', 'architecture'].includes(selected?.value) ? selected.value : 'live';
@@ -3885,6 +3912,8 @@ async function loadObservedConnectome() {
     if (snapshot?.schema !== 'shei.console.observed_connectome/v1') {
       throw new Error('connectome_schema_invalid');
     }
+    const ancStatus = $('connectome-anc-status');
+    if (ancStatus) ancStatus.textContent = connectomeAncStatus(snapshot);
     renderObservedConnectome(snapshot);
     const timestamp = snapshot.generated_at ? new Date(snapshot.generated_at).toLocaleTimeString('es') : 'hora no indicada';
     const latest = snapshot.latest_turn || {};
@@ -3957,6 +3986,16 @@ function scheduleConnectomeRefresh() {
   }, 5000);
 }
 
+function scheduleSystemStatusRefresh() {
+  if (state.systemPollTimer) clearTimeout(state.systemPollTimer);
+  state.systemPollTimer = null;
+  if (state.view !== 'system' || !$('system-integration-checks')) return;
+  state.systemPollTimer = setTimeout(() => {
+    state.systemPollTimer = null;
+    if (state.view === 'system') void loadSystemStatus();
+  }, 20000);
+}
+
 async function loadSystemStatus() {
   const requestId = ++state.systemRequestId;
   $('system-refresh').disabled = true;
@@ -4025,6 +4064,7 @@ async function loadSystemStatus() {
   $('system-observed').textContent = 'Última consulta: ' + new Date().toLocaleString('es') + '. Cada operación devuelve su propio resultado.';
   $('system-refresh').disabled = false;
   if (observations.some((result) => result.status === 'rejected' && result.reason.code === 'AUTH_REQUIRED')) showAccess();
+  scheduleSystemStatusRefresh();
 }
 
 function clearVaultSensitiveView(message = '') {
