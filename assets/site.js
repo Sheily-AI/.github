@@ -3996,6 +3996,15 @@ function scheduleSystemStatusRefresh() {
   }, 20000);
 }
 
+function tidexStatusReachable(body) {
+  return body?.schema === 'tidex.lifelong_memory_status/v1'
+    && body.configured === true
+    && body.enabled === true
+    && body.can_evaluate === true
+    && Array.isArray(body.blockers)
+    && body.blockers.length === 0;
+}
+
 async function loadSystemStatus() {
   const requestId = ++state.systemRequestId;
   $('system-refresh').disabled = true;
@@ -4030,7 +4039,7 @@ async function loadSystemStatus() {
   const sessionScoped = valueOrUnknown(selection, body => body?.schema === 'shei.llm_session_selection/v1' && body.scope === 'authenticated_owner_conversation' && /^[a-f0-9]{64}$/.test(body.owner_binding || '') && /^[a-f0-9]{64}$/.test(body.session_binding || ''));
   const historyReachable = valueOrUnknown(history, body => body?.read_only === true && Array.isArray(body.turns) && /^[a-f0-9]{64}$/.test(body.history_version || ''));
   const jobsReachable = valueOrUnknown(jobs, body => body?.ok === true && Array.isArray(body.jobs));
-  const tidexReachable = valueOrUnknown(tidex, body => body?.schema === 'tidex.lifelong_memory_status/v1' && body.ok === true);
+  const tidexReachable = valueOrUnknown(tidex, tidexStatusReachable);
   // An upstream release gate is not evidence that personal notes or scoped
   // selection are defective. Keep both unverified until a real 200 contract
   // arrives, while surfacing the shared blocker instead of hiding its cause.
