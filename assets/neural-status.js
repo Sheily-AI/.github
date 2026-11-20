@@ -23,7 +23,7 @@
   }
   async function init() {
     let data;
-    try { const r = await fetch('./assets/neural-status.json', { cache: 'no-cache' }); if (!r.ok) return; data = await r.json(); } catch { return; }
+    try { const r = await fetch('./assets/neural-status.json?v=20261120', { cache: 'no-cache' }); if (!r.ok) return; data = await r.json(); } catch { return; }
     const panel = render(data); if (!panel) return;
     const system = document.getElementById('system-status-grid');
     if (system) {
