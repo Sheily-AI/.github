@@ -3635,9 +3635,16 @@ function connectomeTurnTiming(snapshot, now = Date.now()) {
   const start = Date.parse(String(turn.started_at || ''));
   const observedAt = Number.isFinite(end) ? end : start;
   const ageMs = Number.isFinite(observedAt) ? Math.max(0, now - observedAt) : null;
-  const recent = ageMs !== null && ageMs <= 60000 && observedAt <= now + 5000;
-  return { ageMs, observedAt, recent, running: recent && status === 'RUNNING',
-    historical: status !== 'RUNNING' || !recent };
+  // The API is a read-only journal projection, not a process-liveness probe.
+  // Never animate an unverified, finished or timestamp-less turn.
+  const journalVerified = snapshot?.evidence?.journal_integrity_verified === true;
+  const available = turn.available === true;
+  const recentStart = Number.isFinite(start) && start <= now + 5000 &&
+    now - start >= -5000 && now - start <= 60000;
+  const running = journalVerified && available && status === 'RUNNING' &&
+    !Number.isFinite(end) && recentStart;
+  return { ageMs, observedAt, recent: recentStart, running, historical: !running,
+    journalVerified };
 }
 
 // Provenance is not functionality. A listed owner path or an instrumented
@@ -3714,8 +3721,11 @@ function connectomeStatusSummary(snapshot, presentation, consultedAt) {
       ' · no acredita ejecución · consultado ' + consultedAt;
   }
   if (presentation.mode === 'live' && !presentation.timing.running) {
-    return 'Sin ejecución verificada en curso · ' + declaredNodes + ' nodos declarados' +
-      identityProof + ' · consultado ' + consultedAt;
+    const journal = presentation.timing.journalVerified
+      ? 'sin turno en curso acreditado en el diario'
+      : 'diario de turnos sin verificación vigente';
+    return 'Sin ejecución verificada en curso (' + journal + '; no implica servicios detenidos) · ' +
+      declaredNodes + ' nodos declarados' + identityProof + ' · consultado ' + consultedAt;
   }
   const assessment = snapshot?.assessment || {};
   const latest = snapshot?.latest_turn || {};
@@ -3729,6 +3739,50 @@ function connectomeStatusSummary(snapshot, presentation, consultedAt) {
     String(snapshot?.coverage?.flow_stages_observed || 0) + '/' +
     String(snapshot?.coverage?.flow_stages_total || 0) + ' etapas observadas' + identityProof +
     observationKind + ' · consultado ' + consultedAt + correlation + terminal + lastRecordedAt;
+}
+
+// All numeric evidence is bounded and qualified by its actual provenance.
+// In particular, the legacy console backend sent a hard-coded 0 even when
+// individual release-bound certification had never been collected.
+function connectomeCoverageSummary(snapshot) {
+  const nodes = Number(snapshot?.node_count);
+  if (!Number.isInteger(nodes) || nodes <= 0 ||
+      snapshot?.canonical_topology?.exact_identity_contract_verified !== true) {
+    return 'Inventario sin certificación exacta de identidades; no se infiere funcionamiento.';
+  }
+  const coverage = snapshot?.coverage || {};
+  const count = (value, max) => Number.isInteger(value) && value >= 0 &&
+    value <= max ? value : null;
+  const stages = count(coverage.flow_stages_total, nodes);
+  const nonFlow = stages === null ? null : nodes - stages;
+  const tests = nonFlow === null ? null : count(coverage.individual_behavior_tests_declared, nonFlow);
+  const emitters = stages === null ? null : count(coverage.emitter_source_anchors_verified, stages);
+  const testLabel = tests === null ? 'sin recuento válido'
+    : tests + '/' + nonFlow + ' declarados (no certifica ejecución)';
+  const emitterLabel = emitters === null ? 'sin recuento válido'
+    : emitters + '/' + stages + ' emisores del flujo canónico comprobados en código';
+  const journalVerified = snapshot?.evidence?.journal_integrity_verified === true;
+  const observed = count(coverage.verified_journal_observed_nodes, nodes);
+  const window = count(snapshot?.evidence?.window, 100000);
+  const analyzed = count(snapshot?.evidence?.turns_analyzed, window ?? 100000);
+  const observedLabel = journalVerified && observed !== null
+    ? observed + '/' + nodes + ' nodos observados en los ' + (analyzed ?? 'últimos') +
+      ' turnos de la ventana' + (window === null ? '' : ' (máximo ' + window + ')')
+    : 'observación no disponible sin diario íntegro y recuento válido';
+  const individual = count(coverage.per_node_functional_certifications, nodes);
+  // A numeric value, even zero, is NOT proof of release certification.
+  const released = coverage.per_node_functional_certification_scope ===
+    'EXECUTED_RELEASE_BOUND_EVIDENCE' &&
+    coverage.per_node_functional_certification_evidence_verified === true;
+  const functional = released && individual !== null
+    ? individual + '/' + nodes + ' con certificación funcional ligada a la release'
+    : 'evidencia no recopilada o no acreditada para esta release';
+  return 'Inventario exacto ' + nodes + '/' + nodes +
+    ' (identidades, no funcionamiento). Contratos de prueba: ' + testLabel +
+    '. Emisores: ' + emitterLabel +
+    '. Diario: ' + observedLabel +
+    '. Certificaciones funcionales independientes: ' + functional +
+    '. La presencia de archivos y los eventos históricos NO acreditan funcionamiento actual.';
 }
 
 function renderObservedConnectome(snapshot) {
@@ -3930,16 +3984,10 @@ async function loadObservedConnectome() {
     if (snapshot.canonical_topology?.exact_identity_contract_verified !== true) {
       warnings.push('Inventario de ' + declaredNodes + ' identidades sin certificación exacta en el backend actual: no asumir que todos los nodos son los previstos.');
     } else {
-      const signed = Number(snapshot.coverage?.verified_journal_observed_nodes || 0);
-      const emitters = Number(snapshot.coverage?.emitter_source_anchors_verified || 0);
-      const testsDeclared = Number(snapshot.coverage?.individual_behavior_tests_declared || 0);
-      const individual = Number(snapshot.coverage?.per_node_functional_certifications || 0);
-      const flowStages = Number(snapshot.coverage?.flow_stages_total || 0);
-      const nonFlowNodes = Math.max(0, declaredNodes - flowStages);
-      warnings.push('Inventario exacto ' + declaredNodes + '/' + declaredNodes + ' verificado. Contratos de pruebas individuales: ' + testsDeclared + '/' + nonFlowNodes + '. Emisores fuente localizados: ' + emitters + '/' + declaredNodes + '; nodos observados en diario: ' + signed + '/' + declaredNodes + '; certificaciones funcionales independientes en la release: ' + individual + '/' + declaredNodes + '. La existencia del archivo NO equivale a funcionamiento.');
+      warnings.push(connectomeCoverageSummary(snapshot));
     }
-    if (presentation.mode === 'live' && timing.historical && latest.available === true) {
-      warnings.push('No hay actividad verificada en curso. El último turno solo se dibuja al elegir “Último turno histórico”.');
+    if (presentation.mode === 'live' && timing.historical) {
+      warnings.push('El panel no ha acreditado un turno en ejecución mediante el diario. Esto NO indica que SHEILY ni otros servicios estén detenidos. El turno guardado se muestra solo al elegir “Último turno histórico”.');
     }
     const showTurnDiagnostics = presentation.mode === 'history' || (presentation.mode === 'live' && timing.running);
     if (showTurnDiagnostics && snapshot.drift?.committed_flow_contradiction_latest === true) {
@@ -3993,12 +4041,11 @@ function scheduleSystemStatusRefresh() {
 }
 
 function tidexStatusReachable(body) {
-  return body?.schema === 'tidex.lifelong_memory_status/v1'
+  return body?.schema === 'shei.tidex.consultability/v1'
     && body.configured === true
     && body.enabled === true
     && body.can_evaluate === true
-    && Array.isArray(body.blockers)
-    && body.blockers.length === 0;
+    && body.blockers_present === false;
 }
 
 async function loadSystemStatus() {
@@ -4015,7 +4062,7 @@ async function loadSystemStatus() {
     apiRequest('/api/inference/session-selection?' + scope),
     apiRequest('/api/lifelong-memory/history?offset=0&limit=1'),
     apiRequest('/api/lifelong-memory/jobs?offset=0&limit=1'),
-    tidexAllowed() ? apiRequest('/api/tidex/status') : Promise.reject(new Error('private_access_required')),
+    state.vaultUnlocked ? apiRequest('/api/tidex/consultability') : Promise.reject(new Error('private_access_required')),
   ]);
   if (requestId !== state.systemRequestId) return;
   const [health, readiness, privacy, lifelongMemory, notes, selection, history, jobs, tidex] = observations;
@@ -4064,7 +4111,8 @@ async function loadSystemStatus() {
   const checked = entries.filter(([, result]) => result === true).length;
   $('system-cutover-verdict').textContent = checked + ' de ' + entries.length + ' conexiones comprobadas en esta consulta.'
     + (releaseBlockedChecks.size ? ' ' + releaseBlockedChecks.size + ' consultas bloqueadas por certificación de producción; no son fallos certificados de sus módulos.' : '')
-    + (tidexAllowed() ? '' : ' Desbloquea la zona privada desde un acceso autorizado para comprobar también TIDEX.')
+    + (!state.vaultUnlocked ? ' Desbloquea la zona privada para comprobar también TIDEX.'
+      : tidex.status === 'rejected' ? ' La consulta TIDEX no se pudo verificar desde este acceso.' : '')
     + ' La verificación de migración y recuperación se documenta en el informe de instalación.';
   $('system-observed').textContent = 'Última consulta: ' + new Date().toLocaleString('es') + '. Cada operación devuelve su propio resultado.';
   $('system-refresh').disabled = false;
