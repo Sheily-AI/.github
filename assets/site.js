@@ -47,7 +47,7 @@ const state = {
   systemRequestId: 0,
   systemPollTimer: null,
   connectomeRequestId: 0,
-  connectomePollTimer: null,
+  connectomeLastRefreshTurnId: '',
   inferenceSelection: null,
   inferenceOptions: [],
   inferenceVerified: false,
@@ -329,10 +329,6 @@ function setConnected(connected) {
 function setView(view, options = {}) {
   if (!WORKSPACE_VIEWS.includes(view)) view = 'chat';
   state.view = view;
-  if (view !== 'system' && state.connectomePollTimer) {
-    clearTimeout(state.connectomePollTimer);
-    state.connectomePollTimer = null;
-  }
   if (view !== 'system' && state.systemPollTimer) {
     clearTimeout(state.systemPollTimer);
     state.systemPollTimer = null;
@@ -1750,6 +1746,7 @@ function startTurnProgress(correlationId, thinkingId) {
           updateTimelineCard(timelineNode, timeline);
         }
         updateOperationalTurnTerminal(thinkingId, terminal);
+        refreshObservedConnectomeForTurn(correlationId);
       }
     } catch { /* The verified turn snapshot remains the authoritative source. */ }
     close();
@@ -1786,6 +1783,9 @@ function startTurnProgress(correlationId, thinkingId) {
         );
         const verified = timelineFromVerifiedSnapshot(snapshot, correlationId);
         if (verified) timeline = verified;
+        if (snapshot?.finished === true && snapshot?.correlation_id === correlationId) {
+          refreshObservedConnectomeForTurn(correlationId);
+        }
       } catch { /* Preserve the live evidence already observed. */ }
       if (!timeline) return;
       const terminal = delivery === 'committed' && timeline.terminal === 'COMMITTED' ? 'COMMITTED' :
@@ -3971,19 +3971,15 @@ async function loadObservedConnectome() {
     graph.replaceChildren();
     status.textContent = 'No se pudo leer el conectome: ' + String(error?.message || error);
     if (alert) { alert.textContent = 'No hay evidencia suficiente para dibujar un recorrido.'; alert.hidden = false; }
-  } finally {
-    if (requestId === state.connectomeRequestId) scheduleConnectomeRefresh();
   }
 }
 
-function scheduleConnectomeRefresh() {
-  if (state.connectomePollTimer) clearTimeout(state.connectomePollTimer);
-  state.connectomePollTimer = null;
-  if (state.view !== 'system' || !$('connectome-graph')) return;
-  state.connectomePollTimer = setTimeout(() => {
-    state.connectomePollTimer = null;
-    if (state.view === 'system') void loadObservedConnectome();
-  }, 5000);
+function refreshObservedConnectomeForTurn(correlationId) {
+  const completedTurnId = String(correlationId || '').trim();
+  if (!completedTurnId || state.connectomeLastRefreshTurnId === completedTurnId) return false;
+  state.connectomeLastRefreshTurnId = completedTurnId;
+  if (state.view === 'system' && $('connectome-graph')) void loadObservedConnectome();
+  return true;
 }
 
 function scheduleSystemStatusRefresh() {
