@@ -60,7 +60,7 @@ test('owner production surfaces use the scoped ticket while arbitrary endpoints 
   }
   assert.equal(calls.length,0);
   await sandbox.fetch('/api/auth/session', {method:'POST', body:JSON.stringify({token:'SomeSecurePassword2026'})});
-  for (const path of ['/api/vault/items','/api/admin/health','/api/tidex/status','/api/workspace/closure']) {
+  for (const path of ['/api/vault/items','/api/admin/health','/api/tidex/status','/api/tidex/consultability','/api/workspace/closure']) {
     await sandbox.fetch(path);
     const call = calls.at(-1);
     assert.equal(call.url, 'https://yo-venus-series.tail2ed060.ts.net:8443' + path);
@@ -125,10 +125,29 @@ test('public system panel checks TIDEX through owner authentication and keeps re
   assert.doesNotMatch(site, /Restringido en web pública/);
   assert.match(site, /tidexReachable = valueOrUnknown/);
   assert.match(site, /function tidexStatusReachable\(body\)/);
+  assert.match(site, /state\.vaultUnlocked \? apiRequest\('\/api\/tidex\/consultability'\)/);
+  assert.doesNotMatch(site, /tidexAllowed\(\) \? apiRequest\('\/api\/tidex\/status'\)/);
+  assert.match(site, /shei\.tidex\.consultability\/v1/);
   assert.match(site, /body\.configured === true/);
   assert.match(site, /body\.can_evaluate === true/);
-  assert.match(site, /body\.blockers\.length === 0/);
+  assert.match(site, /body\.blockers_present === false/);
   assert.doesNotMatch(site, /tidex\.lifelong_memory_status\/v1' && body\.ok === true/);
   assert.match(site, /readiness\.value\.body\.ready === true/);
   assert.match(site, /health\.value\.body\.status === 'alive'/);
+});
+
+test('TIDEX consultability requires a complete live, bounded projection', () => {
+  const site = fs.readFileSync('assets/site.js', 'utf8');
+  const definition = site.match(/function tidexStatusReachable\(body\) \{[\s\S]*?\n\}/)?.[0];
+  assert.ok(definition);
+  const reachable = vm.runInNewContext(definition + '\ntidexStatusReachable');
+  const ready = {
+    schema: 'shei.tidex.consultability/v1', configured: true,
+    enabled: true, can_evaluate: true, blockers_present: false,
+  };
+  assert.equal(reachable(ready), true);
+  assert.equal(reachable({...ready, blockers_present: true}), false);
+  assert.equal(reachable({...ready, can_evaluate: false}), false);
+  assert.equal(reachable({...ready, schema: 'tidex.lifelong_memory_status/v1'}), false);
+  assert.equal(reachable({...ready, blockers_present: undefined}), false);
 });

@@ -5,7 +5,7 @@
     "assets/pages-live-transport.js": "23c40860746f43d9d202bc864dce95e1146a64e279012130039d52eedba478c1",
     "assets/results.js": "ee7f76e9eb2b002b9fe29309254a64d18900f66aa7e17b6ae0398d1981aad6fe",
     "assets/site.css": "85a488a1394090f50bacad391f273918a02106e77d2011742d19ecd8c3c3a6a3",
-    "assets/site.js": "d6d9c7bf007821d72104b946db5f729e9af7a8fb0f6e4ddbd89aec33f5bd8640",
+    "assets/site.js": "867437c1ab757db59aa1fe4cd57d69e0e9657b6b3f397ba077930dd8fc8de6b8",
     "assets/uploads.js": "f6cbd0d26a20e27c991bc65e32c08b6db3827788c41516c3ef7c6ce9fb3f8191",
     "assets/vendor/fflate.LICENSE": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551",
     "assets/vendor/fflate.min.js": "462ef8041fc970e3615a20a9dd2b2e3047a073b2da729ef4f02b634bba8b7b83",
@@ -18,5 +18,5 @@
   },
   "schema": "sheily.pages.build-provenance/v1",
   "source_repository": "Sheily-AI/SHEILY-COGNITIVA",
-  "source_sha": "98d71bc492de59265aadb5c81356c8779606e791"
+  "source_sha": "6e21d99f97af92eca37e889754e14359ca1af949"
 }
