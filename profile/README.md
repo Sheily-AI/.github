@@ -4,7 +4,7 @@
 
 Organización dedicada a desarrollar componentes de IA auditables. Cada sistema tiene responsabilidades, repositorio y ciclo de validación propios. La descripción de una capacidad no implica que esté activada ni certificada en producción.
 
-[Explorar repositorios](https://github.com/orgs/Sheily-AI/repositories) · [Guía de la organización](https://github.com/Sheily-AI/.github/blob/main/README.md) · [Documentación de SHEILY](https://github.com/Sheily-AI/SHEILY-COGNITIVA/tree/main/docs)
+[Web pública oficial](https://sheily-ai.github.io/.github/) · [Explorar repositorios](https://github.com/orgs/Sheily-AI/repositories) · [Guía de la organización](https://github.com/Sheily-AI/.github/blob/main/README.md) · [Documentación de SHEILY](https://github.com/Sheily-AI/SHEILY-COGNITIVA/tree/main/docs)
 
 ## Proyectos y componentes
 
@@ -24,7 +24,6 @@ Organización dedicada a desarrollar componentes de IA auditables. Cada sistema 
 
 - **SHEILY-COGNITIVA** gobierna la interacción, la admisión de capacidades y sus efectos en su propio producto.
 - **INICIO**, **GLOBUS**, **TIDEX** y los servicios auxiliares conservan fronteras y contratos de autoridad independientes.
-- **KV-SHEI / M-SLIM** es un sistema de inferencia y memoria K/V **distinto de SHEILY**. Sus antiguos enlaces no figuran entre los repositorios accesibles en el inventario actual, por lo que esta portada no los presenta como repositorios disponibles.
 
 Las integraciones se acreditan con código, configuración y pruebas para una versión concreta; un esquema conceptual no demuestra que el circuito esté operativo.
 

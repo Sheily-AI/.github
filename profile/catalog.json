@@ -6,20 +6,36 @@
       "label": "SHEILY-COGNITIVA"
     },
     {
-      "name": "KV-SHEI",
-      "label": "KV-SHEI / M-SLIM"
-    },
-    {
       "name": "INICIO",
       "label": "INICIO"
     },
     {
-      "name": "KV-SHEI-tch-rs",
-      "label": "KV-SHEI-tch-rs"
+      "name": "GLOBUS",
+      "label": "GLOBUS"
     },
     {
-      "name": "KV-SHEI-tokenizador-rust",
-      "label": "KV-SHEI-tokenizador-rust"
+      "name": "TIDEX",
+      "label": "TIDEX"
+    },
+    {
+      "name": "SHEILY-LIFELONG-MEMORY",
+      "label": "SHEILY-LIFELONG-MEMORY"
+    },
+    {
+      "name": "SHEILY-INICIO-CONNECTOR",
+      "label": "SHEILY-INICIO-CONNECTOR"
+    },
+    {
+      "name": "SHEILY-DEPLOYMENT-ORCHESTRATOR",
+      "label": "SHEILY-DEPLOYMENT-ORCHESTRATOR"
+    },
+    {
+      "name": "SHEILY-ANDROID",
+      "label": "SHEILY-ANDROID"
+    },
+    {
+      "name": "PROJECT-AUDITOR",
+      "label": "PROJECT-AUDITOR"
     }
   ]
 }

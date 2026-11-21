@@ -4,7 +4,7 @@
 > [Estado local verificado](docs/ESTADO_VERIFICADO_ACTUAL.md) · [Inventario de documentos](docs/INVENTARIO_DOCUMENTAL_ACTUAL.md) — captura a 2026-11-19T23:44:26+01:00; no es un panel en vivo.
 <!-- current-state:end -->
 
-Esta carpeta de GitHub mantiene la [portada pública de la organización](profile/README.md) y un índice de sus componentes. No es un panel en tiempo real.
+Esta carpeta de GitHub mantiene la [portada pública de la organización](profile/README.md), el acceso a la [web pública oficial de SHEILY](https://sheily-ai.github.io/.github/) y un índice de sus componentes. No es un panel en tiempo real.
 
 ## Áreas de trabajo
 
@@ -18,10 +18,6 @@ Esta carpeta de GitHub mantiene la [portada pública de la organización](profil
 | Interfaces y auditoría | [SHEILY-ANDROID](https://github.com/Sheily-AI/SHEILY-ANDROID), [PROJECT-AUDITOR](https://github.com/Sheily-AI/PROJECT-AUDITOR) | Cliente Android y evidencia técnica |
 
 Los enlaces anteriores corresponden a los nueve repositorios funcionales accesibles en la consulta del inventario. Algunos requieren permiso porque son privados.
-
-## Sistemas independientes
-
-KV-SHEI / M-SLIM y SHEILY no son la misma arquitectura. KV-SHEI trata inferencia y K/V; SHEILY trata la cognición y sus responsabilidades de producto. No se declara integración, disponibilidad del repositorio ni desplegabilidad sin verificar las fuentes actuales de cada sistema.
 
 ## Niveles de evidencia
 
